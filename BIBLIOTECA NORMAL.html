@@ -18,12 +18,28 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
+    :root {
+      --cor-fundo-pagina: #16255c;
+      --cor-fundo-secao: #ffffff;
+      --cor-texto-secao: #1a3a5c;
+      --cor-fundo-item: #e3edfb;
+      --cor-borda: #d6e4f7;
+      --cor-texto-autor: #2c5aa0;
+    }
+    body.modo-escuro {
+      --cor-fundo-pagina: #0b1330;
+      --cor-fundo-secao: #1e2a4a;
+      --cor-texto-secao: #dce8ff;
+      --cor-fundo-item: #2a3a5f;
+      --cor-borda: #3a4a70;
+      --cor-texto-autor: #9dc0f2;
+    }
     body {
       font-family: Arial, sans-serif;
       margin: 20px;
-      background: #16255c;
+      background: var(--cor-fundo-pagina);
       position: relative;
       overflow-x: hidden;
     }
@@ -63,18 +79,19 @@
       padding-bottom: 4px;
     }
     section {
-      background: #fff;
+      background: var(--cor-fundo-secao);
+      color: var(--cor-texto-secao);
       padding: 12px 15px;
       margin-bottom: 16px;
       border-radius: 16px;
       box-shadow: 0 0 10px #cfe0f5;
-      border: 1px solid #d6e4f7;
+      border: 1px solid var(--cor-borda);
     }
     label {
       font-weight: bold;
       display: block;
       margin-top: 10px;
-      color: #1a3a5c;
+      color: var(--cor-texto-secao);
     }
     input, select, textarea, button {
       margin-top: 5px;
@@ -105,7 +122,8 @@
       padding-left: 0;
     }
     ul li {
-      background: #e3edfb;
+      background: var(--cor-fundo-item);
+      color: var(--cor-texto-secao);
       margin-bottom: 5px;
       padding: 10px 14px;
       border-radius: 14px;
@@ -117,7 +135,17 @@
     }
     li.atrasado {
       background: #fbe3e3;
+      color: #5c1515 !important;
       border: 1px solid #e0a3a3;
+    }
+
+    li.atrasado > span:first-child {
+      color: #5c1515 !important;
+    }
+
+    body.modo-escuro li.atrasado,
+    body.modo-escuro li.atrasado > span:first-child {
+      color: #5c1515 !important;
     }
     .badge {
       background: #d3e3f7;
@@ -202,6 +230,13 @@
       flex: 1;
       min-width: 140px;
     }
+    .linha-email button {
+      width: auto;
+      margin-top: 0;
+      font-size: 0.78rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
     .estatisticas-grid {
       display: flex;
       flex-wrap: wrap;
@@ -209,7 +244,7 @@
       margin-top: 8px;
     }
     .card-estatistica {
-      background: #e3edfb;
+      background: var(--cor-fundo-item);
       border-radius: 14px;
       padding: 10px 14px;
       min-width: 120px;
@@ -224,6 +259,14 @@
     .card-estatistica .rotulo {
       font-size: 0.78rem;
       color: #3a6ea8;
+    }
+    .autor-texto {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      font-style: italic;
+      color: var(--cor-texto-autor);
+      margin-top: 2px;
     }
     li.item-disponivel {
       flex-direction: column;
@@ -315,6 +358,22 @@
       height: 16px;
       fill: #ffffff;
     }
+    #temaBtn {
+      position: fixed;
+      top: 16px;
+      right: 54px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #0d47a1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 0 6px rgba(13, 71, 161, 0.4);
+      z-index: 50;
+      font-size: 15px;
+    }
     #painelAdmin, #loginPanel {
       display: none;
     }
@@ -335,7 +394,7 @@
       display: flex;
     }
     .modal-box {
-      background: #fff;
+      background: var(--cor-fundo-secao);
       border-radius: 18px;
       padding: 20px;
       max-width: 360px;
@@ -343,7 +402,7 @@
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
     }
     .modal-box p {
-      color: #1a3a5c;
+      color: var(--cor-texto-secao);
       margin: 0 0 6px;
       line-height: 1.4;
     }
@@ -394,12 +453,17 @@
   <div id="trigger" title="Área da Bibliotecária">
     <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.9-2.2 4.9-4.9S14.7 2.2 12 2.2 7.1 4.4 7.1 7.1 9.3 12 12 12zm0 2.5c-3.3 0-9.8 1.6-9.8 4.9v2.4h19.6v-2.4c0-3.3-6.5-4.9-9.8-4.9z"/></svg>
   </div>
+  <div id="temaBtn" title="Alternar tema claro/escuro">⏾</div>
 
   <section id="loginPanel">
     <h2>Login da Bibliotecária</h2>
     <form id="loginForm">
+      <label for="adminEmail">Email:</label>
+      <input type="email" id="adminEmail" autocomplete="username" required />
+
       <label for="adminPassword">Senha:</label>
-      <input type="password" id="adminPassword" required />
+      <input type="password" id="adminPassword" autocomplete="current-password" required />
+
       <button type="submit">Entrar</button>
     </form>
     <p id="loginFeedback"></p>
@@ -410,6 +474,14 @@
     <div id="estatisticasContainer"></div>
 
     <h2 style="margin-top:18px;">Adicionar Livro</h2>
+
+    <button type="button" id="scanBtn" class="btn-secundario" style="width:auto; padding:6px 16px; border-radius:999px;">📷 Escanear código de barras (ISBN)</button>
+    <div id="scanContainer" style="display:none; margin-top:10px;">
+      <div id="scanReader" style="width:100%; max-width:320px; border-radius:14px; overflow:hidden;"></div>
+      <button type="button" id="scanCancelBtn" class="btn-perigo" style="width:auto; padding:6px 16px; border-radius:999px; margin-top:8px;">Cancelar leitura</button>
+      <p id="scanFeedback" style="color:#5c7ca3; font-size:0.85rem;"></p>
+    </div>
+
     <form id="addBookForm">
       <label for="newBookTitle">Título do Livro:</label>
       <input type="text" id="newBookTitle" required />
@@ -424,8 +496,9 @@
     </form>
 
     <h2 style="margin-top:18px;">Emails das Bibliotecárias</h2>
-    <p style="color:#5c7ca3; font-size:0.85rem; margin-top:-6px;">Esses emails aparecem como opções no formulário de Contato. Edite aqui sempre que precisar trocar algum.</p>
+    <p style="color:#5c7ca3; font-size:0.85rem; margin-top:-6px;">Esses emails aparecem como opções no formulário de Contato. Adicione, edite ou remova conforme precisar.</p>
     <div id="libraryEmailsForm"></div>
+    <button type="button" id="addEmailBtn" class="btn-secundario" style="margin-top:8px; width:auto; padding:6px 16px; border-radius:999px;">+ Adicionar bibliotecária</button>
     <button type="button" id="saveEmailsBtn" style="margin-top:10px;">Salvar Emails</button>
     <p id="emailsFeedback"></p>
 
@@ -550,96 +623,243 @@
     return await abrirModal({ mensagem, comInput: true, valorInicial, comCancelar: true, textoConfirmar: "OK", textoCancelar: "Cancelar" });
   }
 
-  // A senha não fica em texto puro no código — guardamos só o hash SHA-256 dela.
-  // Aviso importante: isso NÃO é segurança real, porque tudo roda no navegador do
-  // usuário. Alguém disposto a tentar senhas offline contra esse hash ainda pode
-  // descobrir a senha original. Pra proteção de verdade, seria preciso um servidor
-  // validando o login (fora do que dá pra fazer só com HTML/JS no cliente).
-  const ADMIN_PASSWORD_HASH = "31756be9e088f88f6be86a9dd50590b6b0fddd357a7ba8d18f673adc340b7314";
-  const ADMIN_SESSION_KEY = "biblioteca-sessao-bibliotecaria";
-  // Se já tinha feito login antes neste navegador, continua logada mesmo
-  // depois de atualizar a página — sem precisar digitar a senha de novo.
-  let isAdminLoggedIn = (localStorage.getItem(ADMIN_SESSION_KEY) === "true");
+  // ---- Autenticação da Bibliotecária (Supabase Auth) ----
+  // A senha NÃO fica guardada neste arquivo. O Supabase Auth faz a validação
+  // da senha e mantém a sessão do usuário autenticado.
+  const SUPABASE_URL = "https://pzisjwgzwlqwxhrrysil.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_AxH0vZYkqzVTLjG-xlcFMg_LlRsIPDb";
 
-  async function hashText(text) {
-    const data = new TextEncoder().encode(text);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    return Array.from(new Uint8Array(hashBuffer))
-      .map(b => b.toString(16).padStart(2, "0"))
-      .join("");
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+  let isAdminLoggedIn = false;
+  let currentSupabaseUser = null;
+
+  async function atualizarSessaoAdmin(session) {
+    currentSupabaseUser = session ? session.user : null;
+    isAdminLoggedIn = !!currentSupabaseUser;
+
+    const painel = document.getElementById("painelAdmin");
+    const login = document.getElementById("loginPanel");
+    const atrasadosBtn = document.getElementById("abaAtrasadosBtn");
+
+    if (isAdminLoggedIn) {
+      painel.style.display = "block";
+      login.style.display = "none";
+      atrasadosBtn.style.display = "";
+    } else {
+      painel.style.display = "none";
+      login.style.display = "none";
+      atrasadosBtn.style.display = "none";
+    }
+
+    renderLists();
   }
 
-  // Credenciais do EmailJS (usadas no formulário de contato)
+  async function inicializarAutenticacao() {
+    const { data, error } = await supabaseClient.auth.getSession();
+
+    if (error) {
+      console.error("Erro ao recuperar sessão do Supabase:", error);
+      await atualizarSessaoAdmin(null);
+      return;
+    }
+
+    await atualizarSessaoAdmin(data.session);
+
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "TOKEN_REFRESHED") {
+        atualizarSessaoAdmin(session);
+      }
+    });
+  }
+
+  // Credenciais do EmailJS (usadas no formulário de contato e nos avisos automáticos)
   const EMAILJS_PUBLIC_KEY = "_9nbVoub4jzy9q5Vn";
   const EMAILJS_SERVICE_ID = "service_nq1njcg";
   const EMAILJS_TEMPLATE_ID = "template_nn3n09j";
-  emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+
+  // O EmailJS só é carregado na hora em que um email de verdade precisa ser
+  // enviado (contato, comprovante de devolução, aviso de fila) — assim ele
+  // não pesa no carregamento inicial da página pra quem só vem consultar.
+  let ultimoErroEmail = "";
+  function emailValido(texto) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((texto || "").trim());
+  }
+  let emailjsCarregado = false;
+  function carregarEmailJS() {
+    return new Promise((resolve, reject) => {
+      if (emailjsCarregado) { resolve(); return; }
+      const script = document.createElement("script");
+      script.src = "https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js";
+      script.onload = () => {
+        emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+        emailjsCarregado = true;
+        resolve();
+      };
+      script.onerror = () => reject(new Error("Falha ao carregar o serviço de email."));
+      document.head.appendChild(script);
+    });
+  }
+
+  async function enviarEmailAutomatico({ paraEmail, mensagem, nomeRemetente = "Biblioteca Virtual", emailRemetente = "biblioteca@escola.gov.br" }) {
+    try {
+      await carregarEmailJS();
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          from_name: nomeRemetente,
+          from_email: emailRemetente,
+          reply_to: emailRemetente,
+          message: mensagem,
+          to_email: paraEmail
+        },
+        { publicKey: EMAILJS_PUBLIC_KEY }
+      );
+      return true;
+    } catch (err) {
+      console.error("Erro ao enviar email automático:", err);
+      ultimoErroEmail = (err && (err.text || err.message)) || "erro desconhecido";
+      return false;
+    }
+  }
 
   // Lista fixa de gêneros disponíveis para os livros
   const GENEROS = ["Ficção", "Aventura", "Fantasia", "Romance", "Terror e Suspense", "Infantil", "Biografia", "Didático", "Poesia", "Quadrinhos", "Mangás", "Outro"];
 
-  // ---- Persistência (JSONBin.io - banco de dados na internet) ----
-  // Guardamos tudo (livros + emails das bibliotecárias) num único "bin",
-  // então funciona de qualquer navegador ou computador, desde que o site
-  // esteja hospedado com endereço https:// (não abrindo o arquivo direto).
-  const JSONBIN_BIN_ID = "6a7d21d7f5f4af5e290ed271";
-  const JSONBIN_MASTER_KEY = "$2a$10$31/POkHbZwICjUCaKtK4hOgEdLQX4K0WlN1ucKJW0dyhObnaBRWFe";
-  const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
-
+  // ---- Persistência (Supabase Database) ----
   const DEFAULT_LIBRARY_EMAILS = [
     { name: "Luciara Perereia", email: "luciara.perereia@educacao.mg.gov.br" },
-    { name: "Regiane Borges", email: "regiane.borges@educacao.mg.gov.br" },
-    { name: "Terceira Bibliotecária", email: "terceiro.email@educacao.mg.gov.br" }
+    { name: "Regiane Borges", email: "regiane.borges@educacao.mg.gov.br" }
   ];
 
   let books = [];
   let libraryEmails = DEFAULT_LIBRARY_EMAILS.slice();
   let bookLimit = 1;
 
+ 
   async function loadData() {
-    try {
-      const response = await fetch(`${JSONBIN_URL}/latest`, {
-        headers: { "X-Master-Key": JSONBIN_MASTER_KEY }
-      });
-      if (!response.ok) throw new Error(`Erro HTTP ${response.status}`);
-      const data = await response.json();
-      books = (data.record && Array.isArray(data.record.books)) ? data.record.books : [];
-      libraryEmails = (data.record && Array.isArray(data.record.libraryEmails) && data.record.libraryEmails.length)
-        ? data.record.libraryEmails
-        : DEFAULT_LIBRARY_EMAILS.slice();
-      bookLimit = (data.record && typeof data.record.bookLimit === "number" && data.record.bookLimit >= 1)
-        ? data.record.bookLimit
-        : 1;
-    } catch (err) {
-      console.error("Erro ao carregar dados do JSONBin:", err);
+  try {
+    const { data, error } = await supabaseClient
+      .from("biblioteca_dados")
+      .select("books, library_emails, book_limit")
+      .eq("id", 1)
+      .maybeSingle();
+
+    if (error) throw error;
+
+    if (data) {
+      books = Array.isArray(data.books) ? data.books : [];
+
+      libraryEmails =
+        Array.isArray(data.library_emails) && data.library_emails.length
+          ? data.library_emails
+          : DEFAULT_LIBRARY_EMAILS.slice();
+
+      bookLimit =
+        Number.isInteger(data.book_limit) && data.book_limit >= 1
+          ? data.book_limit
+          : 1;
+    } else {
       books = [];
       libraryEmails = DEFAULT_LIBRARY_EMAILS.slice();
-      document.getElementById("loadingMsg").textContent =
-        "Não foi possível carregar os dados salvos. Verifique sua conexão com a internet.";
-      document.getElementById("loadingMsg").style.color = "#ffb3b3";
-      renderAll();
-      return;
+      bookLimit = 1;
+
+      if (isAdminLoggedIn) {
+        const { error: insertError } = await supabaseClient
+          .from("biblioteca_dados")
+          .insert([{
+            id: 1,
+            books: [],
+            library_emails: libraryEmails,
+            book_limit: bookLimit,
+            updated_at: new Date().toISOString()
+          }]);
+
+        if (insertError && insertError.code !== "23505") {
+          throw insertError;
+        }
+      }
     }
+
     document.getElementById("loadingMsg").style.display = "none";
     renderAll();
+
+  } catch (err) {
+    console.error("Erro ao carregar dados do Supabase:", err);
+
+    books = [];
+    libraryEmails = DEFAULT_LIBRARY_EMAILS.slice();
+    bookLimit = 1;
+
+    document.getElementById("loadingMsg").textContent =
+      "Não foi possível carregar os dados salvos. Verifique sua conexão com a internet.";
+
+    document.getElementById("loadingMsg").style.color = "#ffb3b3";
+
+    renderAll();
+  }
+}
+
+async function saveData() {
+  if (!isAdminLoggedIn) {
+    await modalAlerta("Somente a bibliotecária pode salvar alterações.");
+    return false;
   }
 
-  async function saveData() {
-    try {
-      const response = await fetch(JSONBIN_URL, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Master-Key": JSONBIN_MASTER_KEY
-        },
-        body: JSON.stringify({ books, libraryEmails, bookLimit })
-      });
-      if (!response.ok) throw new Error(`Erro HTTP ${response.status}`);
-    } catch (err) {
-      console.error("Erro ao salvar dados no JSONBin:", err);
-      await modalAlerta("Não foi possível salvar os dados agora. Verifique sua conexão com a internet e tente novamente.");
+  try {
+    const dadosParaSalvar = {
+      id: 1,
+      books: books,
+      library_emails: libraryEmails,
+      book_limit: bookLimit,
+      updated_at: new Date().toISOString()
+    };
+
+    const { data, error } = await supabaseClient
+      .from("biblioteca_dados")
+      .upsert(dadosParaSalvar, {
+        onConflict: "id"
+      })
+      .select("id, books, library_emails, book_limit")
+      .single();
+
+    if (error) {
+      throw error;
     }
+
+    if (!data) {
+      throw new Error("O Supabase não confirmou o salvamento.");
+    }
+
+    // Confirma que o banco recebeu exatamente a lista atual.
+    books = Array.isArray(data.books) ? data.books : [];
+    libraryEmails =
+      Array.isArray(data.library_emails) && data.library_emails.length
+        ? data.library_emails
+        : DEFAULT_LIBRARY_EMAILS.slice();
+
+    bookLimit =
+      Number.isInteger(data.book_limit) && data.book_limit >= 1
+        ? data.book_limit
+        : 1;
+
+    return true;
+
+  } catch (err) {
+    console.error("Erro ao salvar dados no Supabase:", err);
+
+    const motivo =
+      (err && (err.message || err.details || err.hint)) ||
+      "erro desconhecido";
+
+    await modalAlerta(
+      `Não foi possível salvar as alterações no banco de dados.\n\nMotivo: ${motivo}`
+    );
+
+    return false;
   }
+}
 
   function renderAll() {
     popularSelectsDeGenero();
@@ -647,12 +867,6 @@
     renderLibraryEmailsForm();
     renderContactRecipients();
     document.getElementById("bookLimitInput").value = bookLimit;
-
-    // Se já estava logada (sessão salva), mostra o painel e a aba Atrasados
-    // direto, sem pedir senha de novo.
-    if (isAdminLoggedIn) {
-      document.getElementById("abaAtrasadosBtn").style.display = "";
-    }
   }
 
   // ---- Abas ----
@@ -693,6 +907,15 @@
     });
   }
 
+  // Data de hoje no fuso do navegador (toISOString usa UTC e, no Brasil,
+  // passava pro dia seguinte a partir das 21h).
+  function dataLocalISO(d) {
+    const ano = d.getFullYear();
+    const mes = String(d.getMonth() + 1).padStart(2, "0");
+    const dia = String(d.getDate()).padStart(2, "0");
+    return `${ano}-${mes}-${dia}`;
+  }
+
   function formatarData(iso) {
     if (!iso) return "sem data definida";
     const [ano, mes, dia] = iso.split("-");
@@ -719,7 +942,6 @@
     const filtroAutor = document.getElementById("filtroAutor");
     const valorAtual = filtroAutor.value || "Todos";
 
-    // Lista de autores distintos entre os livros disponíveis, ignorando vazios
     const autoresDisponiveis = [...new Set(
       books.filter(b => b.status === "available" && b.autor && b.autor.trim())
         .map(b => b.autor.trim())
@@ -737,7 +959,6 @@
       filtroAutor.appendChild(option);
     });
 
-    // Mantém a seleção anterior se ela ainda existir na lista
     if ([...filtroAutor.options].some(o => o.value === valorAtual)) {
       filtroAutor.value = valorAtual;
     }
@@ -753,7 +974,6 @@
     const atrasados = books.filter(b => b.status === "reading" && b.dataEntrega && diasDeAtraso(b.dataEntrega) > 0).length;
     const totalNaFila = books.reduce((soma, b) => soma + ((b.fila || []).length), 0);
 
-    // Gênero mais popular (mais livros cadastrados naquele gênero)
     const contagemGeneros = {};
     books.forEach(b => {
       const g = b.genero || "Outro";
@@ -818,7 +1038,6 @@
     }
 
     const generosPresentes = GENEROS.filter(g => disponiveis.some(b => b.genero === g));
-    // Livros sem gênero definido (dados antigos) caem em "Outro"
     const semGenero = disponiveis.filter(b => !GENEROS.includes(b.genero));
 
     generosPresentes.forEach(genero => {
@@ -856,9 +1075,7 @@
     infoTitulo.appendChild(tituloTexto);
     if (book.autor && book.autor.trim()) {
       const autorTexto = document.createElement("span");
-      autorTexto.style.display = "block";
-      autorTexto.style.fontSize = "0.78rem";
-      autorTexto.style.color = "#5c7ca3";
+      autorTexto.className = "autor-texto";
       autorTexto.textContent = book.autor.trim();
       infoTitulo.appendChild(autorTexto);
     }
@@ -889,13 +1106,19 @@
     linhaPrincipal.appendChild(acoes);
     li.appendChild(linhaPrincipal);
 
-    // Campinho que aparece dentro do próprio item ao clicar em "Agendar"
+    // Campinho que aparece dentro do próprio item ao clicar em "Agendar".
+    // Pede nome E email agora — o email é usado pra mandar o comprovante
+    // de devolução quando o livro voltar.
     const formInline = document.createElement("div");
     formInline.className = "agendar-inline";
 
     const nomeInput = document.createElement("input");
     nomeInput.type = "text";
     nomeInput.placeholder = "Seu nome";
+
+    const emailInput = document.createElement("input");
+    emailInput.type = "email";
+    emailInput.placeholder = "Seu email (pro comprovante de devolução)";
 
     const confirmarBtn = document.createElement("button");
     confirmarBtn.className = "btn-confirmar";
@@ -909,6 +1132,7 @@
     erroSpan.className = "erro-inline";
 
     formInline.appendChild(nomeInput);
+    formInline.appendChild(emailInput);
     formInline.appendChild(confirmarBtn);
     formInline.appendChild(cancelarBtn);
     formInline.appendChild(erroSpan);
@@ -922,32 +1146,35 @@
     cancelarBtn.onclick = () => {
       formInline.classList.remove("aberto");
       nomeInput.value = "";
+      emailInput.value = "";
       erroSpan.classList.remove("visivel");
     };
 
-    confirmarBtn.onclick = () => agendarLivro(book.id, nomeInput.value, erroSpan);
-    nomeInput.addEventListener("keydown", (e) => {
+    confirmarBtn.onclick = () => agendarLivro(book.id, nomeInput.value, emailInput.value, erroSpan);
+    emailInput.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
         e.preventDefault();
-        agendarLivro(book.id, nomeInput.value, erroSpan);
+        agendarLivro(book.id, nomeInput.value, emailInput.value, erroSpan);
       }
     });
 
     return li;
   }
 
-  async function agendarLivro(id, nomeDigitado, erroSpan) {
+  async function agendarLivro(id, nomeDigitado, emailDigitado, erroSpan) {
     const book = books.find(b => b.id === id);
     if (!book) return;
 
-    if (!nomeDigitado || !nomeDigitado.trim()) {
+    const nome = (nomeDigitado || "").trim();
+    const email = (emailDigitado || "").trim();
+
+    if (!nome || !email) {
       if (erroSpan) {
-        erroSpan.textContent = "Digite seu nome para agendar.";
+        erroSpan.textContent = "Preencha seu nome e email para agendar.";
         erroSpan.classList.add("visivel");
       }
       return;
     }
-    const nome = nomeDigitado.trim();
 
     const emprestadosComEssePleitor = books.filter(
       b => b.status === "reading" && b.reader && b.reader.trim().toLowerCase() === nome.toLowerCase()
@@ -968,9 +1195,10 @@
 
     book.status = "reading";
     book.reader = nome;
+    book.readerEmail = email;
     const sugestao = new Date();
     sugestao.setDate(sugestao.getDate() + 14);
-    book.dataEntrega = sugestao.toISOString().split("T")[0];
+    book.dataEntrega = dataLocalISO(sugestao);
 
     await saveData();
     renderLists();
@@ -1015,6 +1243,7 @@
       filaBtn.textContent = "Entrar na fila";
       acoes.appendChild(filaBtn);
 
+      // A devolução é só da bibliotecária — evita bagunça/devoluções falsas.
       if (isAdminLoggedIn) {
         const dateInput = document.createElement("input");
         dateInput.type = "date";
@@ -1106,7 +1335,6 @@
     await modalAlerta(`Pronto! Você está na fila de espera de "${book.title}". Avisamos por email assim que ele voltar.`);
   }
 
-
   function renderAtrasados() {
     const lateList = document.getElementById("lateBooksList");
     lateList.innerHTML = "";
@@ -1154,11 +1382,26 @@
       emailInput.dataset.idx = idx;
       emailInput.dataset.campo = "email";
 
+      const removerBtn = document.createElement("button");
+      removerBtn.type = "button";
+      removerBtn.className = "btn-perigo";
+      removerBtn.textContent = "Remover";
+      removerBtn.onclick = () => {
+        libraryEmails.splice(idx, 1);
+        renderLibraryEmailsForm();
+      };
+
       linha.appendChild(nomeInput);
       linha.appendChild(emailInput);
+      linha.appendChild(removerBtn);
       container.appendChild(linha);
     });
   }
+
+  document.getElementById("addEmailBtn").addEventListener("click", () => {
+    libraryEmails.push({ name: "", email: "" });
+    renderLibraryEmailsForm();
+  });
 
   function renderContactRecipients() {
     const select = document.getElementById("contactRecipient");
@@ -1182,7 +1425,7 @@
     if (!book) return;
 
     const novoTitulo = await modalPrompt("Novo título do livro:", book.title);
-    if (novoTitulo === null) return; // cancelou a edição
+    if (novoTitulo === null) return;
     const tituloFinal = novoTitulo.trim() ? novoTitulo.trim() : book.title;
 
     const novoAutor = await modalPrompt("Autor do livro (deixe em branco se não souber):", book.autor || "");
@@ -1202,7 +1445,6 @@
       }
     }
 
-    // Só troca título, autor e gênero — status, leitor e data de devolução continuam como estavam
     book.title = tituloFinal;
     book.autor = autorFinal;
     book.genero = generoFinal;
@@ -1210,54 +1452,135 @@
     renderLists();
   }
 
-  async function removerLivro(id) {
-    const book = books.find(b => b.id === id);
-    if (!book) return;
-    const confirmou = await modalConfirmar(`Remover "${book.title}" da biblioteca?`);
-    if (confirmou) {
-      books = books.filter(b => b.id !== id);
-      await saveData();
-      renderLists();
-    }
+async function removerLivro(id) {
+  if (!isAdminLoggedIn) {
+    await modalAlerta("Somente a bibliotecária pode remover livros.");
+    return;
   }
+
+  const book = books.find(b => b.id === id);
+
+  if (!book) {
+    await modalAlerta("Livro não encontrado.");
+    return;
+  }
+
+  const confirmou = await modalConfirmar(
+    `Tem certeza que deseja remover permanentemente o livro "${book.title}" da biblioteca?`
+  );
+
+  if (!confirmou) {
+    return;
+  }
+
+  // Guarda uma cópia antes de alterar.
+  const livrosAnteriores = [...books];
+
+  // Remove o livro da lista.
+  books = books.filter(b => b.id !== id);
+
+  // Tenta salvar a nova lista no Supabase.
+  const salvou = await saveData();
+
+  if (!salvou) {
+    // Se deu erro, restaura a lista anterior.
+    books = livrosAnteriores;
+
+    renderLists();
+
+    await modalAlerta(
+      `O livro "${book.title}" NÃO foi removido porque não foi possível salvar a alteração.`
+    );
+
+    return;
+  }
+
+  // Só chega aqui se o Supabase confirmou o salvamento.
+  renderLists();
+
+  await modalAlerta(
+    `O livro "${book.title}" foi removido permanentemente da biblioteca.`
+  );
+}
 
   async function concluirLeitura(id) {
     if (!isAdminLoggedIn) { await modalAlerta("Somente a bibliotecária pode registrar devoluções."); return; }
     const book = books.find(b => b.id === id);
     if (!book) return;
-    book.status = "available";
-    delete book.reader;
-    delete book.dataEntrega;
 
-    // Se tem gente esperando na fila, avisa o primeiro por email
-    let avisoFila = "";
-    if (book.fila && book.fila.length > 0) {
-      const proximo = book.fila.shift();
-      try {
-        await emailjs.send(
-          EMAILJS_SERVICE_ID,
-          EMAILJS_TEMPLATE_ID,
-          {
-            from_name: "Biblioteca Virtual",
-            from_email: "biblioteca@escola.gov.br",
-            reply_to: "biblioteca@escola.gov.br",
-            message: `Olá, ${proximo.name}! O livro "${book.title}" que você estava esperando já está disponível na Biblioteca Virtual. Corre lá agendar antes que outra pessoa pegue!`,
-            to_email: proximo.email
-          },
-          { publicKey: EMAILJS_PUBLIC_KEY }
-        );
-        avisoFila = ` ${proximo.name} foi avisado(a) por email.`;
-      } catch (err) {
-        console.error("Erro ao avisar a fila de espera:", err);
-        avisoFila = ` Não foi possível avisar ${proximo.name} por email agora — avise manualmente se puder.`;
+    const tituloLivro = book.title;
+    const nomeDoLeitor = book.reader || "aluno(a)";
+    const dataDevolucaoFormatada = formatarData(dataLocalISO(new Date()));
+    let emailDoLeitor = (book.readerEmail || "").trim();
+
+    // Empréstimos feitos antes de existir o campo de email não têm email guardado.
+    // Nesse caso a bibliotecária pode digitar o email do aluno na hora (ou pular).
+    if (!emailValido(emailDoLeitor)) {
+      const digitado = await modalPrompt(
+        `O empréstimo de "${tituloLivro}" não tem o email de ${nomeDoLeitor} guardado. Digite o email do aluno pra enviar o comprovante (ou deixe em branco pra enviar só pra bibliotecária):`
+      );
+      if (digitado === null) return; // cancelou: não registra a devolução
+      emailDoLeitor = digitado.trim();
+      if (emailDoLeitor && !emailValido(emailDoLeitor)) {
+        await modalAlerta("Esse email não parece válido. A devolução não foi registrada — tente de novo.");
+        return;
       }
     }
 
-    await saveData();
-    renderLists();
-    if (avisoFila) await modalAlerta(`Devolução registrada.${avisoFila}`);
-  }
+    // Registra a devolução e SALVA primeiro. Só depois manda os emails,
+    // pra não avisar ninguém de uma devolução que acabou não sendo salva.
+    book.status = "available";
+    delete book.reader;
+    delete book.readerEmail;
+    delete book.dataEntrega;
 
+    const proximoDaFila = (book.fila && book.fila.length > 0) ? book.fila.shift() : null;
+
+    const salvou = await saveData();
+    if (!salvou) {
+      await loadData(); // desfaz a alteração local, volta ao que está salvo
+      return;
+    }
+    renderLists();
+
+    // Comprovante: vai pro aluno E pra(s) bibliotecária(s), num único envio.
+    const emailsBibliotecarias = libraryEmails.map(e => (e.email || "").trim()).filter(emailValido);
+    const destinatarios = [...new Set(
+      [emailDoLeitor, ...emailsBibliotecarias].filter(emailValido).map(e => e.toLowerCase())
+    )];
+
+    let avisoComprovante = "";
+    if (destinatarios.length > 0) {
+      const registradoPor = currentSupabaseUser && currentSupabaseUser.email ? ` Registrado por: ${currentSupabaseUser.email}.` : "";
+      const enviado = await enviarEmailAutomatico({
+        paraEmail: destinatarios.join(", "),
+        mensagem: `Comprovante de devolução — Biblioteca Virtual (E.E. Bárbara Heliodora). Aluno(a): ${nomeDoLeitor}. Livro: "${tituloLivro}". Data da devolução: ${dataDevolucaoFormatada}.${registradoPor} Obrigado por devolver e cuidar bem dos livros da nossa biblioteca!`
+      });
+      if (enviado) {
+        avisoComprovante = emailDoLeitor
+          ? ` Comprovante enviado para ${nomeDoLeitor} e para a(s) bibliotecária(s).`
+          : ` Comprovante enviado só para a(s) bibliotecária(s) (sem email do aluno).`;
+      } else {
+        avisoComprovante = ` ATENÇÃO: o comprovante NÃO foi enviado (${ultimoErroEmail}).`;
+      }
+    } else {
+      avisoComprovante = " Nenhum email válido para enviar o comprovante.";
+    }
+
+    // Se tem gente esperando na fila, avisa o primeiro por email
+    let avisoFila = "";
+    if (proximoDaFila) {
+      const enviado = await enviarEmailAutomatico({
+        paraEmail: proximoDaFila.email,
+        mensagem: `Olá, ${proximoDaFila.name}! O livro "${tituloLivro}" que você estava esperando já está disponível na Biblioteca Virtual. Corre lá agendar antes que outra pessoa pegue!`
+      });
+      avisoFila = enviado
+        ? ` ${proximoDaFila.name} (fila de espera) foi avisado(a) por email.`
+        : ` Não foi possível avisar ${proximoDaFila.name} por email (${ultimoErroEmail}).`;
+    }
+
+    await modalAlerta(`Devolução registrada.${avisoComprovante}${avisoFila}`);
+  }
 
   async function salvarDataEntrega(id, novaData) {
     if (!isAdminLoggedIn) { await modalAlerta("Somente a bibliotecária pode alterar a data de entrega."); return; }
@@ -1282,21 +1605,40 @@
 
   document.getElementById("loginForm").addEventListener("submit", async (e) => {
     e.preventDefault();
-    const inputPassword = document.getElementById("adminPassword").value;
-    const feedback = document.getElementById("loginFeedback");
-    const inputHash = await hashText(inputPassword);
 
-    if (inputHash === ADMIN_PASSWORD_HASH) {
-      isAdminLoggedIn = true;
-      localStorage.setItem(ADMIN_SESSION_KEY, "true");
-      document.getElementById("painelAdmin").style.display = "block";
-      document.getElementById("loginPanel").style.display = "none";
-      document.getElementById("abaAtrasadosBtn").style.display = "";
-      feedback.textContent = "";
-      renderLists();
-    } else {
-      feedback.textContent = "Senha incorreta. Tente novamente.";
+    const email = document.getElementById("adminEmail").value.trim();
+    const password = document.getElementById("adminPassword").value;
+    const feedback = document.getElementById("loginFeedback");
+    const btn = e.target.querySelector("button[type=\"submit\"]");
+
+    if (!email || !password) {
+      feedback.textContent = "Informe seu email e sua senha.";
+      return;
     }
+
+    btn.disabled = true;
+    btn.textContent = "Entrando...";
+    feedback.textContent = "";
+
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      console.error("Erro no login:", error);
+      if (error.message === "Invalid login credentials") {
+        feedback.textContent = "Email ou senha incorretos.";
+      } else if (error.message && error.message.toLowerCase().includes("email not confirmed")) {
+        feedback.textContent = "Esse email ainda não foi confirmado. Confirme o cadastro (verifique a caixa de entrada) ou desative a confirmação de email no painel do Supabase.";
+      } else {
+        feedback.textContent = `Não foi possível entrar: ${error.message}`;
+      }
+    } else {
+      document.getElementById("adminPassword").value = "";
+      feedback.textContent = "";
+      await atualizarSessaoAdmin(data.session);
+    }
+
+    btn.disabled = false;
+    btn.textContent = "Entrar";
   });
 
   document.getElementById("addBookForm").addEventListener("submit", async (e) => {
@@ -1315,6 +1657,108 @@
     }
   });
 
+  // ---- Leitor de código de barras (ISBN) / QR Code ----
+  // A biblioteca html5-qrcode (bem pesada) só é carregada quando a
+  // bibliotecária clica em "Escanear" — assim a página não fica lenta
+  // pra quem só vem consultar os livros (a grande maioria das visitas).
+  let scannerAtivo = null;
+  let html5QrcodeCarregado = false;
+
+  function carregarScriptScanner() {
+    return new Promise((resolve, reject) => {
+      if (html5QrcodeCarregado) { resolve(); return; }
+      const script = document.createElement("script");
+      script.src = "https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js";
+      script.onload = () => { html5QrcodeCarregado = true; resolve(); };
+      script.onerror = () => reject(new Error("Falha ao carregar o leitor de código de barras."));
+      document.head.appendChild(script);
+    });
+  }
+
+  document.getElementById("scanBtn").addEventListener("click", async () => {
+    if (!isAdminLoggedIn) { await modalAlerta("Somente a bibliotecária pode escanear livros."); return; }
+
+    const container = document.getElementById("scanContainer");
+    const feedback = document.getElementById("scanFeedback");
+    container.style.display = "block";
+    feedback.textContent = "Carregando o leitor...";
+
+    try {
+      await carregarScriptScanner();
+    } catch (err) {
+      console.error(err);
+      feedback.textContent = "Não foi possível carregar o leitor. Verifique sua conexão com a internet.";
+      return;
+    }
+
+    feedback.textContent = "Aponte a câmera para o código de barras (ISBN) na contracapa do livro.";
+
+    try {
+      scannerAtivo = new Html5Qrcode("scanReader");
+      await scannerAtivo.start(
+        { facingMode: "environment" },
+        {
+          fps: 10,
+          qrbox: { width: 250, height: 150 },
+          formatsToSupport: [
+            Html5QrcodeSupportedFormats.EAN_13,
+            Html5QrcodeSupportedFormats.EAN_8,
+            Html5QrcodeSupportedFormats.QR_CODE
+          ]
+        },
+        onCodigoLido,
+        () => { /* erro de leitura em cada frame — ignorar, é normal */ }
+      );
+    } catch (err) {
+      console.error("Erro ao acessar a câmera:", err);
+      feedback.textContent = "Não foi possível acessar a câmera. Verifique se você deu permissão ao navegador.";
+    }
+  });
+
+  async function pararScanner() {
+    if (scannerAtivo) {
+      try {
+        await scannerAtivo.stop();
+        scannerAtivo.clear();
+      } catch (err) {
+        console.error("Erro ao parar o scanner:", err);
+      }
+      scannerAtivo = null;
+    }
+    document.getElementById("scanContainer").style.display = "none";
+  }
+
+  document.getElementById("scanCancelBtn").addEventListener("click", pararScanner);
+
+  async function onCodigoLido(codigoLido) {
+    const feedback = document.getElementById("scanFeedback");
+    feedback.textContent = `Código lido: ${codigoLido}. Buscando informações...`;
+    await pararScanner();
+
+    const apenasNumeros = codigoLido.replace(/[^0-9]/g, "");
+    if (apenasNumeros.length < 8) {
+      await modalAlerta(`Código lido: ${codigoLido}. Não parece ser um ISBN válido — preencha os dados manualmente.`);
+      return;
+    }
+
+    try {
+      const resposta = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${apenasNumeros}&format=json&jscmd=data`);
+      const dados = await resposta.json();
+      const info = dados[`ISBN:${apenasNumeros}`];
+
+      if (info) {
+        document.getElementById("newBookTitle").value = info.title || "";
+        document.getElementById("newBookAutor").value = (info.authors && info.authors.length) ? info.authors.map(a => a.name).join(", ") : "";
+        await modalAlerta(`Livro encontrado: "${info.title || "sem título"}". Confira os dados, escolha o gênero e clique em Adicionar Livro.`);
+      } else {
+        await modalAlerta(`Código ${apenasNumeros} lido, mas não encontrei esse livro na base de dados. Preencha o título e autor manualmente.`);
+      }
+    } catch (err) {
+      console.error("Erro ao buscar dados do livro:", err);
+      await modalAlerta(`Código ${apenasNumeros} lido, mas não consegui buscar os dados agora (verifique a internet). Preencha manualmente.`);
+    }
+  }
+
   document.getElementById("saveEmailsBtn").addEventListener("click", async () => {
     if (!isAdminLoggedIn) { await modalAlerta("Somente a bibliotecária pode editar os emails."); return; }
     const inputs = document.querySelectorAll("#libraryEmailsForm input");
@@ -1322,10 +1766,11 @@
     inputs.forEach(input => {
       const idx = parseInt(input.dataset.idx);
       const campo = input.dataset.campo;
-      novaLista[idx][campo] = input.value.trim();
+      if (novaLista[idx]) novaLista[idx][campo] = input.value.trim();
     });
-    libraryEmails = novaLista;
+    libraryEmails = novaLista.filter(e => e.name || e.email);
     await saveData();
+    renderLibraryEmailsForm();
     renderContactRecipients();
     const feedback = document.getElementById("emailsFeedback");
     feedback.style.color = "#1b5e20";
@@ -1372,15 +1817,18 @@
   });
 
   document.getElementById("logoutBtn").addEventListener("click", async () => {
-    const confirmouSaida = await modalConfirmar("Sair da conta da bibliotecária neste navegador?");
+    const confirmouSaida = await modalConfirmar("Sair da conta da bibliotecária?");
     if (!confirmouSaida) return;
-    isAdminLoggedIn = false;
-    localStorage.removeItem(ADMIN_SESSION_KEY);
-    document.getElementById("painelAdmin").style.display = "none";
-    document.getElementById("abaAtrasadosBtn").style.display = "none";
-    // Se estava na aba Atrasados, volta pra Início
+
+    const { error } = await supabaseClient.auth.signOut();
+    if (error) {
+      console.error("Erro ao sair:", error);
+      await modalAlerta("Não foi possível sair da conta agora. Tente novamente.");
+      return;
+    }
+
+    await atualizarSessaoAdmin(null);
     trocarAba("abaInicio", "abaInicioBtn");
-    renderLists();
   });
 
   document.getElementById("filtroGenero").addEventListener("change", renderDisponiveis);
@@ -1416,34 +1864,35 @@
     feedback.style.color = "#3a6ea8";
     feedback.textContent = "Enviando sua mensagem...";
 
-    try {
-      await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        {
-          from_name: name,
-          from_email: email,
-          reply_to: email,
-          message: message,
-          to_email: toEmail
-        },
-        { publicKey: EMAILJS_PUBLIC_KEY }
-      );
+    const enviado = await enviarEmailAutomatico({ paraEmail: toEmail, mensagem: message, nomeRemetente: name, emailRemetente: email });
+    if (enviado) {
       feedback.style.color = "#1b5e20";
       feedback.textContent = "Mensagem enviada com sucesso! Obrigado por entrar em contato.";
       e.target.reset();
       renderContactRecipients();
-    } catch (err) {
-      console.error("Erro ao enviar email:", err);
-      const detalhe = (err && (err.text || err.message)) ? ` (${err.text || err.message})` : "";
+    } else {
       feedback.style.color = "#b71c1c";
-      feedback.textContent = `Não foi possível enviar a mensagem agora${detalhe}. Tente novamente em instantes.`;
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Enviar Mensagem";
+      feedback.textContent = "Não foi possível enviar a mensagem agora. Tente novamente em instantes.";
     }
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Enviar Mensagem";
   });
 
+  // ---- Alternar tema claro/escuro ----
+  const temaBtn = document.getElementById("temaBtn");
+  if (localStorage.getItem("biblioteca-tema") === "escuro") {
+    document.body.classList.add("modo-escuro");
+    temaBtn.textContent = "☀︎︎";
+  }
+  temaBtn.addEventListener("click", () => {
+    document.body.classList.toggle("modo-escuro");
+    const escuro = document.body.classList.contains("modo-escuro");
+    temaBtn.textContent = escuro ? "☀︎︎" : "⏾";
+    localStorage.setItem("biblioteca-tema", escuro ? "escuro" : "claro");
+  });
+
+  inicializarAutenticacao();
   loadData();
 </script>
-</body></html>
+</body>
+</html>
