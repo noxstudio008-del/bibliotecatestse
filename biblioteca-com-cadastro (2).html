@@ -1,0 +1,2415 @@
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Biblioteca Virtual — E.E. Bárbara Heliodora</title>
+
+  <link rel="icon" type="image/jpeg" href="logo.jpg" />
+
+  <meta name="description" content="Biblioteca Virtual da E.E. Bárbara Heliodora — consulte o acervo, agende livros e acompanhe empréstimos." />
+  <meta property="og:title" content="Biblioteca Virtual — E.E. Bárbara Heliodora" />
+  <meta property="og:description" content="Consulte o acervo, agende livros e acompanhe empréstimos da biblioteca da escola." />
+  <meta property="og:image" content="https://noxstudio008-del.github.io/biblioteca-virtual/logo.jpg" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Biblioteca Virtual — E.E. Bárbara Heliodora" />
+  <meta name="twitter:description" content="Consulte o acervo, agende livros e acompanhe empréstimos da biblioteca da escola." />
+  <meta name="twitter:image" content="https://noxstudio008-del.github.io/biblioteca-virtual/logo.jpg" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --cor-fundo-pagina: #16255c;
+      --cor-fundo-secao: #ffffff;
+      --cor-texto-secao: #1a3a5c;
+      --cor-fundo-item: #e3edfb;
+      --cor-borda: #d6e4f7;
+      --cor-texto-autor: #2c5aa0;
+    }
+    body.modo-escuro {
+      --cor-fundo-pagina: #0b1330;
+      --cor-fundo-secao: #1e2a4a;
+      --cor-texto-secao: #dce8ff;
+      --cor-fundo-item: #2a3a5f;
+      --cor-borda: #3a4a70;
+      --cor-texto-autor: #9dc0f2;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: var(--cor-fundo-pagina);
+      position: relative;
+      overflow-x: hidden;
+    }
+    .cabecalho {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+    .logo-escola {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+      border-radius: 50%;
+      background: #ffffff;
+      padding: 4px;
+      flex-shrink: 0;
+    }
+    h1 {
+      color: #ffffff;
+      margin-bottom: 0;
+      font-family: 'Great Vibes', cursive;
+      font-size: 3rem;
+      font-weight: normal;
+    }
+    h2 {
+      color: #1565c0;
+      font-family: 'Great Vibes', cursive;
+      font-size: 1.7rem;
+      font-weight: normal;
+    }
+    h3.genero-titulo {
+      color: #0d47a1;
+      font-size: 1.05rem;
+      margin: 14px 0 6px;
+      border-bottom: 2px solid #d6e4f7;
+      padding-bottom: 4px;
+    }
+    section {
+      background: var(--cor-fundo-secao);
+      color: var(--cor-texto-secao);
+      padding: 12px 15px;
+      margin-bottom: 16px;
+      border-radius: 16px;
+      box-shadow: 0 0 10px #cfe0f5;
+      border: 1px solid var(--cor-borda);
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 10px;
+      color: var(--cor-texto-secao);
+    }
+    input, select, textarea, button {
+      margin-top: 5px;
+      padding: 6px 8px;
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid #90a9c9;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+      font-size: 0.9rem;
+    }
+    button {
+      background-color: #1565c0;
+      color: white;
+      cursor: pointer;
+      border: none;
+      font-weight: bold;
+    }
+    button:hover {
+      background-color: #0d47a1;
+    }
+    button:disabled {
+      background-color: #9db8db;
+      cursor: not-allowed;
+    }
+    ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    ul li {
+      background: var(--cor-fundo-item);
+      color: var(--cor-texto-secao);
+      margin-bottom: 5px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    li.atrasado {
+      background: #fbe3e3;
+      color: #5c1515 !important;
+      border: 1px solid #e0a3a3;
+    }
+
+    li.atrasado > span:first-child {
+      color: #5c1515 !important;
+    }
+
+    body.modo-escuro li.atrasado,
+    body.modo-escuro li.atrasado > span:first-child {
+      color: #5c1515 !important;
+    }
+    .badge {
+      background: #d3e3f7;
+      color: #0d47a1;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-weight: bold;
+      font-size: 0.8rem;
+      border: 1px solid #90a9c9;
+      white-space: nowrap;
+    }
+    .badge-atraso {
+      background: #f7d3d3;
+      color: #a10d0d;
+      border: 1px solid #c99090;
+    }
+    .vazio {
+      font-style: italic;
+      color: #5c7ca3;
+    }
+    .acoes {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .acoes button {
+      width: auto;
+      padding: 4px 10px;
+      margin-top: 0;
+      font-size: 0.78rem;
+      border-radius: 999px;
+    }
+    .acoes input[type="date"] {
+      width: auto;
+      margin-top: 0;
+      padding: 4px 8px;
+      font-size: 0.78rem;
+    }
+    .btn-secundario {
+      background: #fff;
+      color: #1565c0;
+      border: 1px solid #1565c0;
+    }
+    .btn-secundario:hover {
+      background: #1565c0;
+      color: #fff;
+    }
+    .btn-perigo {
+      background: #fff;
+      color: #b71c1c;
+      border: 1px solid #b71c1c;
+    }
+    .btn-perigo:hover {
+      background: #b71c1c;
+      color: #fff;
+    }
+    .btn-confirmar {
+      background: #fff;
+      color: #1b5e20;
+      border: 1px solid #1b5e20;
+    }
+    .btn-confirmar:hover {
+      background: #1b5e20;
+      color: #fff;
+    }
+    #loadingMsg {
+      color: #ffffff;
+      font-style: italic;
+    }
+    .filtro-genero {
+      max-width: 260px;
+    }
+    .linha-email {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+    .linha-email input {
+      margin-top: 0;
+      flex: 1;
+      min-width: 140px;
+    }
+    .linha-email button {
+      width: auto;
+      margin-top: 0;
+      font-size: 0.78rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+    .estatisticas-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .card-estatistica {
+      background: var(--cor-fundo-item);
+      border-radius: 14px;
+      padding: 10px 14px;
+      min-width: 120px;
+      flex: 1;
+    }
+    .card-estatistica .numero {
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: #0d47a1;
+      display: block;
+    }
+    .card-estatistica .rotulo {
+      font-size: 0.78rem;
+      color: #3a6ea8;
+    }
+    .autor-texto {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      font-style: italic;
+      color: var(--cor-texto-autor);
+      margin-top: 2px;
+    }
+    li.item-disponivel {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .linha-principal {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      width: 100%;
+    }
+    .agendar-inline {
+      display: none;
+      width: 100%;
+      margin-top: 8px;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .agendar-inline.aberto {
+      display: flex;
+    }
+    .agendar-inline input {
+      margin-top: 0;
+      flex: 1;
+      min-width: 140px;
+    }
+    .agendar-inline button {
+      width: auto;
+      margin-top: 0;
+      font-size: 0.78rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    /* Navegação em abas */
+    .abas {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.35);
+      flex-wrap: wrap;
+    }
+    .aba-btn {
+      width: auto;
+      background: none;
+      color: #dce8ff;
+      border: none;
+      border-radius: 4px 4px 0 0;
+      padding: 10px 16px;
+      font-weight: bold;
+      margin-top: 0;
+      border-bottom: 3px solid transparent;
+    }
+    .aba-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+    }
+    .aba-btn.ativa {
+      color: #ffffff;
+      border-bottom: 3px solid #ffffff;
+    }
+    .conteudo-aba {
+      display: none;
+    }
+    .conteudo-aba.ativa {
+      display: block;
+    }
+
+    /* Ícone no canto: dá acesso à área da bibliotecária */
+    #trigger {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #0d47a1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 0 6px rgba(13, 71, 161, 0.4);
+      z-index: 50;
+    }
+    #trigger svg {
+      width: 16px;
+      height: 16px;
+      fill: #ffffff;
+    }
+    #temaBtn {
+      position: fixed;
+      top: 16px;
+      right: 54px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #0d47a1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 0 6px rgba(13, 71, 161, 0.4);
+      z-index: 50;
+      font-size: 15px;
+    }
+    #painelAdmin, #loginPanel, #usuarioPanel, #cadastroPanel {
+      display: none;
+    }
+    #usuarioPanel, #cadastroPanel {
+      max-width: 430px;
+    }
+    .perfil-card {
+      background: var(--cor-fundo-item);
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-top: 10px;
+    }
+    .perfil-card strong { color: #0d47a1; }
+    .status-pendente {
+      color: #8a5a00;
+      background: #fff1c7;
+      border: 1px solid #e1bd63;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-weight: bold;
+      display: inline-block;
+    }
+    .status-emprestado {
+      color: #1b5e20;
+      background: #d9f2dc;
+      border: 1px solid #8bc58f;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-weight: bold;
+      display: inline-block;
+    }
+    #painelAdmin, #loginPanel {
+      display: none;
+    }
+    #loginPanel {
+      max-width: 320px;
+    }
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(13, 24, 60, 0.55);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.aberto {
+      display: flex;
+    }
+    .modal-box {
+      background: var(--cor-fundo-secao);
+      border-radius: 18px;
+      padding: 20px;
+      max-width: 360px;
+      width: 100%;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+    .modal-box p {
+      color: var(--cor-texto-secao);
+      margin: 0 0 6px;
+      line-height: 1.4;
+    }
+    .modal-box input {
+      margin-top: 8px;
+    }
+    .modal-botoes {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .modal-botoes button {
+      width: auto;
+      flex: 1;
+      margin-top: 0;
+    }
+    .erro-inline {
+      display: none;
+      color: #b71c1c;
+      font-size: 0.78rem;
+      width: 100%;
+      margin-top: -2px;
+    }
+    .erro-inline.visivel {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div id="modalOverlay" class="modal-overlay">
+    <div class="modal-box">
+      <p id="modalMensagem"></p>
+      <input type="text" id="modalInput" style="display:none;" />
+      <div class="modal-botoes">
+        <button type="button" id="modalCancelar" class="btn-secundario">Cancelar</button>
+        <button type="button" id="modalConfirmar" class="btn-confirmar">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="cabecalho">
+    <img src="logo.jpg" alt="Logo da escola" class="logo-escola" />
+    <h1>Biblioteca Virtual</h1>
+  </div>
+  <p id="loadingMsg">Carregando dados salvos...</p>
+
+  <!-- Ícone de acesso à área da bibliotecária, escondido no canto -->
+  <div id="trigger" title="Área da Bibliotecária">
+    <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.9-2.2 4.9-4.9S14.7 2.2 12 2.2 7.1 4.4 7.1 7.1 9.3 12 12 12zm0 2.5c-3.3 0-9.8 1.6-9.8 4.9v2.4h19.6v-2.4c0-3.3-6.5-4.9-9.8-4.9z"/></svg>
+  </div>
+  <div id="temaBtn" title="Alternar tema claro/escuro">⏾</div>
+
+  <section id="usuarioPanel">
+    <h2>Área do Aluno / Professor</h2>
+    <form id="usuarioLoginForm">
+      <label for="usuarioEmail">E-mail institucional:</label>
+      <input type="email" id="usuarioEmail" placeholder="seuemail@aluno.mg.gov.br" required />
+      <label for="usuarioPassword">Senha:</label>
+      <input type="password" id="usuarioPassword" required />
+      <button type="submit">Entrar</button>
+    </form>
+    <p id="usuarioLoginFeedback"></p>
+    <button type="button" id="abrirCadastroBtn" class="btn-secundario">Criar cadastro</button>
+  </section>
+
+  <section id="cadastroPanel">
+    <h2>Criar cadastro</h2>
+    <form id="cadastroForm">
+      <label for="cadastroNome">Nome completo:</label>
+      <input type="text" id="cadastroNome" required />
+
+      <label for="cadastroTipo">Você é:</label>
+      <select id="cadastroTipo" required>
+        <option value="">Selecione</option>
+        <option value="aluno">Aluno</option>
+        <option value="professor">Professor</option>
+      </select>
+
+      <div id="dadosAluno" style="display:none;">
+        <label for="cadastroTurma">Turma:</label>
+        <input type="text" id="cadastroTurma" />
+        <label for="cadastroNascimento">Data de nascimento:</label>
+        <input type="date" id="cadastroNascimento" />
+        <label for="cadastroEndereco">Endereço:</label>
+        <input type="text" id="cadastroEndereco" />
+      </div>
+
+      <label for="cadastroTelefone">Telefone:</label>
+      <input type="tel" id="cadastroTelefone" />
+      <label for="cadastroEmail">E-mail institucional:</label>
+      <input type="email" id="cadastroEmail" placeholder="exemplo@aluno.mg.gov.br" required />
+      <label for="cadastroSenha">Senha:</label>
+      <input type="password" id="cadastroSenha" minlength="6" required />
+      <button type="submit">Criar cadastro</button>
+    </form>
+    <p id="cadastroFeedback"></p>
+    <button type="button" id="voltarLoginBtn" class="btn-secundario">Já tenho cadastro</button>
+  </section>
+
+  <section id="loginPanel">
+    <h2>Login da Bibliotecária</h2>
+    <form id="loginForm">
+      <label for="adminEmail">Email:</label>
+      <input type="email" id="adminEmail" autocomplete="username" required />
+
+      <label for="adminPassword">Senha:</label>
+      <input type="password" id="adminPassword" autocomplete="current-password" required />
+
+      <button type="submit">Entrar</button>
+    </form>
+    <p id="loginFeedback"></p>
+  </section>
+
+  <section id="painelAdmin">
+    <h2>Estatísticas</h2>
+    <div id="estatisticasContainer"></div>
+
+    <h2 style="margin-top:18px;">Adicionar Livro</h2>
+
+    <button type="button" id="scanBtn" class="btn-secundario" style="width:auto; padding:6px 16px; border-radius:999px;">📷 Escanear código de barras (ISBN)</button>
+    <div id="scanContainer" style="display:none; margin-top:10px;">
+      <div id="scanReader" style="width:100%; max-width:320px; border-radius:14px; overflow:hidden;"></div>
+      <button type="button" id="scanCancelBtn" class="btn-perigo" style="width:auto; padding:6px 16px; border-radius:999px; margin-top:8px;">Cancelar leitura</button>
+      <p id="scanFeedback" style="color:#5c7ca3; font-size:0.85rem;"></p>
+    </div>
+
+    <form id="addBookForm">
+      <label for="newBookTitle">Título do Livro:</label>
+      <input type="text" id="newBookTitle" required />
+
+      <label for="newBookAutor">Autor:</label>
+      <input type="text" id="newBookAutor" placeholder="Deixe em branco se não souber" />
+
+      <label for="newBookGenero">Gênero:</label>
+      <select id="newBookGenero" required></select>
+
+      <button type="submit">Adicionar Livro</button>
+    </form>
+
+    <h2 style="margin-top:18px;">Emails das Bibliotecárias</h2>
+    <p style="color:#5c7ca3; font-size:0.85rem; margin-top:-6px;">Esses emails aparecem como opções no formulário de Contato. Adicione, edite ou remova conforme precisar.</p>
+    <div id="libraryEmailsForm"></div>
+    <button type="button" id="addEmailBtn" class="btn-secundario" style="margin-top:8px; width:auto; padding:6px 16px; border-radius:999px;">+ Adicionar bibliotecária</button>
+    <button type="button" id="saveEmailsBtn" style="margin-top:10px;">Salvar Emails</button>
+    <p id="emailsFeedback"></p>
+
+    <h2 style="margin-top:18px;">Limite de Livros por Leitor</h2>
+    <p style="color:#5c7ca3; font-size:0.85rem; margin-top:-6px;">Quantos livros a mesma pessoa pode ter emprestados ao mesmo tempo. Padrão: 1.</p>
+    <label for="bookLimitInput" style="margin-top:0;">Limite:</label>
+    <input type="number" id="bookLimitInput" min="1" step="1" />
+    <button type="button" id="saveLimitBtn" style="margin-top:10px;">Salvar Limite</button>
+    <p id="limitFeedback"></p>
+
+    <h2 style="margin-top:18px;">Backup dos Dados</h2>
+    <p style="color:#5c7ca3; font-size:0.85rem; margin-top:-6px;">Baixa uma cópia de segurança de todos os livros e configurações, num arquivo que você pode guardar.</p>
+    <button type="button" id="backupBtn" class="btn-secundario" style="margin-top:6px; width:auto; padding:6px 16px; border-radius:999px;">Baixar backup (.json)</button>
+
+    <h2 style="margin-top:18px;">Solicitações de retirada</h2>
+    <div id="reservasAdminContainer"></div>
+
+    <h2 style="margin-top:18px;">Usuários cadastrados</h2>
+    <div id="usuariosAdminContainer"></div>
+
+    <button type="button" id="logoutBtn" class="btn-perigo" style="margin-top:18px; width:auto; padding:6px 16px; border-radius:999px;">Sair da conta</button>
+  </section>
+
+  <!-- Navegação principal -->
+  <div class="abas">
+    <button type="button" class="aba-btn ativa" id="abaInicioBtn">Início</button>
+    <button type="button" class="aba-btn" id="abaLendoBtn">Emprestados</button>
+    <button type="button" class="aba-btn" id="abaAtrasadosBtn" style="display:none;">Atrasados</button>
+    <button type="button" class="aba-btn" id="abaContatoBtn">Contato</button>
+  <button type="button" class="aba-btn" id="abaMinhaContaBtn">Minha conta</button>
+
+  </div>
+
+  <div id="abaInicio" class="conteudo-aba ativa">
+    <section>
+      <h2>Livros Disponíveis para Leitura</h2>
+      <label for="buscaTitulo" style="margin-top:0;">Buscar por título:</label>
+      <input type="text" id="buscaTitulo" placeholder="Digite o nome do livro..." />
+
+      <label for="filtroGenero">Filtrar por gênero:</label>
+      <select id="filtroGenero" class="filtro-genero"></select>
+
+      <label for="filtroAutor">Filtrar por autor:</label>
+      <select id="filtroAutor" class="filtro-genero"></select>
+      <div id="availableBooksContainer" style="margin-top:12px;"></div>
+    </section>
+  </div>
+
+  <div id="abaLendo" class="conteudo-aba">
+    <section>
+      <h2>Livros Emprestados</h2>
+      <ul id="readingBooksList"></ul>
+    </section>
+  </div>
+
+  <div id="abaAtrasados" class="conteudo-aba">
+    <section>
+      <h2>Devoluções Pendentes / Atrasadas</h2>
+      <ul id="lateBooksList"></ul>
+    </section>
+  </div>
+
+  <div id="abaMinhaConta" class="conteudo-aba">
+    <section>
+      <h2>Minha conta</h2>
+      <div id="minhaContaContainer"></div>
+      <button type="button" id="logoutUsuarioBtn" class="btn-perigo" style="margin-top:12px; width:auto; padding:6px 16px; border-radius:999px;">Sair da conta</button>
+    </section>
+  </div>
+
+  <div id="abaContato" class="conteudo-aba">
+    <section>
+      <h2>Contato com a Biblioteca</h2>
+      <form id="contactForm">
+        <label for="contactName">Nome:</label>
+        <input type="text" id="contactName" required />
+
+        <label for="contactEmail">Email:</label>
+        <input type="email" id="contactEmail" required />
+
+        <label for="contactRecipient">Enviar mensagem para:</label>
+        <select id="contactRecipient" required></select>
+
+        <label for="contactMessage">Mensagem:</label>
+        <textarea id="contactMessage" rows="4" required></textarea>
+
+        <button type="submit" id="contactSubmitBtn">Enviar Mensagem</button>
+      </form>
+      <p id="contactFeedback"></p>
+    </section>
+  </div>
+
+<script>
+  // ---- Modal estilizado (substitui alert/confirm/prompt nativos do navegador) ----
+  function abrirModal({ mensagem, comInput = false, valorInicial = "", comCancelar = true, textoConfirmar = "OK", textoCancelar = "Cancelar" }) {
+    return new Promise((resolve) => {
+      const overlay = document.getElementById("modalOverlay");
+      const msgEl = document.getElementById("modalMensagem");
+      const inputEl = document.getElementById("modalInput");
+      const btnConfirmar = document.getElementById("modalConfirmar");
+      const btnCancelar = document.getElementById("modalCancelar");
+
+      msgEl.textContent = mensagem;
+      inputEl.style.display = comInput ? "block" : "none";
+      inputEl.value = valorInicial;
+      btnCancelar.style.display = comCancelar ? "inline-block" : "none";
+      btnConfirmar.textContent = textoConfirmar;
+      btnCancelar.textContent = textoCancelar;
+
+      overlay.classList.add("aberto");
+      if (comInput) setTimeout(() => inputEl.focus(), 50);
+
+      function fechar() {
+        overlay.classList.remove("aberto");
+        btnConfirmar.onclick = null;
+        btnCancelar.onclick = null;
+      }
+
+      btnConfirmar.onclick = () => {
+        const valor = comInput ? inputEl.value : true;
+        fechar();
+        resolve(valor);
+      };
+      btnCancelar.onclick = () => {
+        fechar();
+        resolve(comInput ? null : false);
+      };
+    });
+  }
+
+  async function modalAlerta(mensagem) {
+    await abrirModal({ mensagem, comCancelar: false, textoConfirmar: "OK" });
+  }
+  async function modalConfirmar(mensagem) {
+    return await abrirModal({ mensagem, comCancelar: true, textoConfirmar: "Sim", textoCancelar: "Cancelar" });
+  }
+  async function modalPrompt(mensagem, valorInicial = "") {
+    return await abrirModal({ mensagem, comInput: true, valorInicial, comCancelar: true, textoConfirmar: "OK", textoCancelar: "Cancelar" });
+  }
+
+  // ---- Autenticação e perfis (Supabase Auth) ----
+  const SUPABASE_URL = "https://pzisjwgzwlqwxhrrysil.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_AxH0vZYkqzVTLjG-xlcFMg_LlRsIPDb";
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+  let isAdminLoggedIn = false;
+  let currentSupabaseUser = null;
+  let currentUserProfile = null;
+  let currentUserType = null;
+  let reservas = [];
+
+  function emailAlunoValido(email) {
+    return /^[^\s@]+@aluno\.mg\.gov\.br$/i.test((email || "").trim());
+  }
+
+  function emailProfessorValido(email) {
+    return /^[^\s@]+@educacao\.mg\.gov\.br$/i.test((email || "").trim());
+  }
+
+  function usuarioLogado() {
+    return !!currentSupabaseUser && !!currentUserProfile;
+  }
+
+  async function carregarPerfilAtual() {
+    if (!currentSupabaseUser) {
+      currentUserProfile = null;
+      currentUserType = null;
+      return;
+    }
+
+    const { data, error } = await supabaseClient
+      .from("perfis")
+      .select("*")
+      .eq("id", currentSupabaseUser.id)
+      .maybeSingle();
+
+    if (error) throw error;
+
+    currentUserProfile = data || null;
+    currentUserType = data ? data.tipo : null;
+  }
+
+  async function carregarReservas() {
+    reservas = [];
+    if (!currentSupabaseUser) return;
+
+    let query = supabaseClient
+      .from("reservas")
+      .select("id, livro_id, aluno_id, status, created_at, picked_up_at, due_date, perfis(nome,email,tipo,turma,codigo_aluno)")
+      .order("created_at", { ascending: true });
+
+    if (!isAdminLoggedIn) {
+      query = query.eq("aluno_id", currentSupabaseUser.id);
+    }
+
+    const { data, error } = await query;
+    if (error) {
+      console.error("Erro ao carregar solicitações:", error);
+      return;
+    }
+    reservas = data || [];
+  }
+
+  function atualizarVisibilidadeUsuario() {
+    const usuarioPanel = document.getElementById("usuarioPanel");
+    const cadastroPanel = document.getElementById("cadastroPanel");
+    const painel = document.getElementById("painelAdmin");
+    const login = document.getElementById("loginPanel");
+    const atrasadosBtn = document.getElementById("abaAtrasadosBtn");
+    const minhaContaBtn = document.getElementById("abaMinhaContaBtn");
+
+    painel.style.display = "none";
+    login.style.display = "none";
+    cadastroPanel.style.display = "none";
+    usuarioPanel.style.display = "block";
+    atrasadosBtn.style.display = "none";
+
+    // A área de aluno/professor fica visível para quem visita o site.
+    // Somente a bibliotecária esconde essa área ao entrar no painel administrativo.
+    if (!currentSupabaseUser) {
+      minhaContaBtn.style.display = "none";
+      return;
+    }
+
+    minhaContaBtn.style.display = "";
+
+    if (isAdminLoggedIn) {
+      usuarioPanel.style.display = "none";
+      painel.style.display = "block";
+      atrasadosBtn.style.display = "";
+    } else if (currentUserProfile) {
+      // Aluno/professor logado: mostra a área de conta e mantém o acervo acessível.
+      usuarioPanel.style.display = "none";
+    }
+  }
+
+  async function atualizarSessaoAdmin(session) {
+    currentSupabaseUser = session ? session.user : null;
+    currentUserProfile = null;
+    currentUserType = null;
+    isAdminLoggedIn = false;
+
+    try {
+      await carregarPerfilAtual();
+      isAdminLoggedIn = currentUserType === "bibliotecaria";
+      await carregarReservas();
+    } catch (err) {
+      console.error("Erro ao carregar perfil/sessão:", err);
+      currentUserProfile = null;
+      currentUserType = null;
+      isAdminLoggedIn = false;
+    }
+
+    atualizarVisibilidadeUsuario();
+    renderMinhaConta();
+    renderReservasAdmin();
+    renderUsuariosAdmin();
+    renderLists();
+  }
+
+  async function inicializarAutenticacao() {
+    const { data, error } = await supabaseClient.auth.getSession();
+    if (error) {
+      console.error("Erro ao recuperar sessão:", error);
+      await atualizarSessaoAdmin(null);
+      return;
+    }
+
+    await atualizarSessaoAdmin(data.session);
+
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "TOKEN_REFRESHED") {
+        setTimeout(() => atualizarSessaoAdmin(session), 0);
+      }
+    });
+  }
+
+  // Credenciais do EmailJS (usadas no formulário de contato e nos avisos automáticos)
+  const EMAILJS_PUBLIC_KEY = "_9nbVoub4jzy9q5Vn";
+  const EMAILJS_SERVICE_ID = "service_nq1njcg";
+  const EMAILJS_TEMPLATE_ID = "template_nn3n09j";
+
+  // O EmailJS só é carregado na hora em que um email de verdade precisa ser
+  // enviado (contato, comprovante de devolução, aviso de fila) — assim ele
+  // não pesa no carregamento inicial da página pra quem só vem consultar.
+  let ultimoErroEmail = "";
+  function emailValido(texto) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((texto || "").trim());
+  }
+  let emailjsCarregado = false;
+  function carregarEmailJS() {
+    return new Promise((resolve, reject) => {
+      if (emailjsCarregado) { resolve(); return; }
+      const script = document.createElement("script");
+      script.src = "https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js";
+      script.onload = () => {
+        emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+        emailjsCarregado = true;
+        resolve();
+      };
+      script.onerror = () => reject(new Error("Falha ao carregar o serviço de email."));
+      document.head.appendChild(script);
+    });
+  }
+
+  async function enviarEmailAutomatico({ paraEmail, mensagem, nomeRemetente = "Biblioteca Virtual", emailRemetente = "biblioteca@escola.gov.br" }) {
+    try {
+      await carregarEmailJS();
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          from_name: nomeRemetente,
+          from_email: emailRemetente,
+          reply_to: emailRemetente,
+          message: mensagem,
+          to_email: paraEmail
+        },
+        { publicKey: EMAILJS_PUBLIC_KEY }
+      );
+      return true;
+    } catch (err) {
+      console.error("Erro ao enviar email automático:", err);
+      ultimoErroEmail = (err && (err.text || err.message)) || "erro desconhecido";
+      return false;
+    }
+  }
+
+  // Lista fixa de gêneros disponíveis para os livros
+  const GENEROS = ["Ficção", "Aventura", "Fantasia", "Romance", "Terror e Suspense", "Infantil", "Biografia", "Didático", "Poesia", "Quadrinhos", "Mangás", "Outro"];
+
+  // ---- Persistência (Supabase Database) ----
+  const DEFAULT_LIBRARY_EMAILS = [
+    { name: "Luciara Perereia", email: "luciara.perereia@educacao.mg.gov.br" },
+    { name: "Regiane Borges", email: "regiane.borges@educacao.mg.gov.br" }
+  ];
+
+  let books = [];
+  let libraryEmails = DEFAULT_LIBRARY_EMAILS.slice();
+  let bookLimit = 1;
+
+  
+  async function loadData() {
+  try {
+    const { data, error } = await supabaseClient
+      .from("biblioteca_dados")
+      .select("books, library_emails, book_limit")
+      .eq("id", 1)
+      .maybeSingle();
+
+    if (error) throw error;
+
+    if (data) {
+      books = Array.isArray(data.books) ? data.books : [];
+
+      libraryEmails =
+        Array.isArray(data.library_emails) && data.library_emails.length
+          ? data.library_emails
+          : DEFAULT_LIBRARY_EMAILS.slice();
+
+      bookLimit =
+        Number.isInteger(data.book_limit) && data.book_limit >= 1
+          ? data.book_limit
+          : 1;
+    } else {
+      books = [];
+      libraryEmails = DEFAULT_LIBRARY_EMAILS.slice();
+      bookLimit = 1;
+
+      if (isAdminLoggedIn) {
+        const { error: insertError } = await supabaseClient
+          .from("biblioteca_dados")
+          .insert([{
+            id: 1,
+            books: [],
+            library_emails: libraryEmails,
+            book_limit: bookLimit,
+            updated_at: new Date().toISOString()
+          }]);
+
+        if (insertError && insertError.code !== "23505") {
+          throw insertError;
+        }
+      }
+    }
+
+    document.getElementById("loadingMsg").style.display = "none";
+    renderAll();
+
+  } catch (err) {
+    console.error("Erro ao carregar dados do Supabase:", err);
+
+    books = [];
+    libraryEmails = DEFAULT_LIBRARY_EMAILS.slice();
+    bookLimit = 1;
+
+    document.getElementById("loadingMsg").textContent =
+      "Não foi possível carregar os dados salvos. Verifique sua conexão com a internet.";
+
+    document.getElementById("loadingMsg").style.color = "#ffb3b3";
+
+    renderAll();
+  }
+}
+
+async function saveData() {
+  if (!isAdminLoggedIn) {
+    await modalAlerta("Somente a bibliotecária pode salvar alterações.");
+    return false;
+  }
+
+  try {
+    const dadosParaSalvar = {
+      id: 1,
+      books: books,
+      library_emails: libraryEmails,
+      book_limit: bookLimit,
+      updated_at: new Date().toISOString()
+    };
+
+    const { data, error } = await supabaseClient
+      .from("biblioteca_dados")
+      .upsert(dadosParaSalvar, {
+        onConflict: "id"
+      })
+      .select("id, books, library_emails, book_limit")
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    if (!data) {
+      throw new Error("O Supabase não confirmou o salvamento.");
+    }
+
+    // Confirma que o banco recebeu exatamente a lista atual.
+    books = Array.isArray(data.books) ? data.books : [];
+    libraryEmails =
+      Array.isArray(data.library_emails) && data.library_emails.length
+        ? data.library_emails
+        : DEFAULT_LIBRARY_EMAILS.slice();
+
+    bookLimit =
+      Number.isInteger(data.book_limit) && data.book_limit >= 1
+        ? data.book_limit
+        : 1;
+
+    return true;
+
+  } catch (err) {
+    console.error("Erro ao salvar dados no Supabase:", err);
+
+    const motivo =
+      (err && (err.message || err.details || err.hint)) ||
+      "erro desconhecido";
+
+    await modalAlerta(
+      `Não foi possível salvar as alterações no banco de dados.\n\nMotivo: ${motivo}`
+    );
+
+    return false;
+  }
+}
+
+  function formatarDataHora(iso) {
+    if (!iso) return "—";
+    const d = new Date(iso);
+    return d.toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
+  }
+
+  function encontrarLivro(id) {
+    return books.find(b => Number(b.id) === Number(id));
+  }
+
+  function podeSolicitarLivro() {
+    return currentUserType === "aluno" || currentUserType === "professor";
+  }
+
+  function jaTemSolicitacaoOuEmprestimo(livroId) {
+    if (!currentSupabaseUser) return false;
+    const pendente = reservas.some(r => Number(r.livro_id) === Number(livroId) && r.status === "pendente");
+    const emprestado = books.some(b => Number(b.id) === Number(livroId) && b.status === "reading" && b.readerEmail === currentSupabaseUser.email);
+    return pendente || emprestado;
+  }
+
+  async function solicitarLivro(livroId) {
+    if (!currentSupabaseUser || !currentUserProfile) {
+      await modalAlerta("Entre com seu e-mail institucional antes de solicitar um livro.");
+      document.getElementById("usuarioPanel").style.display = "block";
+      return;
+    }
+
+    if (!podeSolicitarLivro()) {
+      await modalAlerta("Somente alunos e professores podem solicitar livros.");
+      return;
+    }
+
+    const livro = encontrarLivro(livroId);
+    if (!livro || livro.status !== "available") {
+      await modalAlerta("Esse livro não está disponível no momento.");
+      return;
+    }
+
+    if (jaTemSolicitacaoOuEmprestimo(livroId)) {
+      await modalAlerta("Você já tem uma solicitação ou empréstimo desse livro.");
+      return;
+    }
+
+    const emprestadosDoUsuario = books.filter(
+      b => b.status === "reading" && b.readerEmail && b.readerEmail.toLowerCase() === currentSupabaseUser.email.toLowerCase()
+    ).length;
+
+    if (emprestadosDoUsuario >= bookLimit) {
+      await modalAlerta(
+        bookLimit === 1
+          ? "Você já está com um livro emprestado. Devolva o livro atual antes de solicitar outro."
+          : `Você já atingiu o limite de ${bookLimit} livros emprestados.`
+      );
+      return;
+    }
+
+    const { data, error } = await supabaseClient
+      .from("reservas")
+      .insert({
+        livro_id: livro.id,
+        aluno_id: currentSupabaseUser.id,
+        status: "pendente"
+      })
+      .select("id, livro_id, aluno_id, status, created_at, picked_up_at, due_date, perfis(nome,email,tipo,turma,codigo_aluno)")
+      .single();
+
+    if (error) {
+      console.error("Erro ao solicitar livro:", error);
+      await modalAlerta("Não foi possível enviar a solicitação. Tente novamente.");
+      return;
+    }
+
+    reservas.push(data);
+    renderLists();
+    renderMinhaConta();
+    renderReservasAdmin();
+    await modalAlerta(`Solicitação enviada! A bibliotecária precisa confirmar a retirada de "${livro.title}" quando você for buscar o livro.`);
+  }
+
+  async function cancelarMinhaReserva(id) {
+    const reserva = reservas.find(r => r.id === id && r.aluno_id === currentSupabaseUser?.id);
+    if (!reserva || reserva.status !== "pendente") return;
+
+    const confirmou = await modalConfirmar("Cancelar esta solicitação de livro?");
+    if (!confirmou) return;
+
+    const { error } = await supabaseClient
+      .from("reservas")
+      .update({ status: "cancelada" })
+      .eq("id", id)
+      .eq("aluno_id", currentSupabaseUser.id)
+      .eq("status", "pendente");
+
+    if (error) {
+      await modalAlerta("Não foi possível cancelar a solicitação.");
+      return;
+    }
+
+    await carregarReservas();
+    renderMinhaConta();
+    renderReservasAdmin();
+    renderLists();
+  }
+
+  async function confirmarRetirada(id) {
+    if (!isAdminLoggedIn) {
+      await modalAlerta("Somente a bibliotecária pode confirmar a retirada.");
+      return;
+    }
+
+    const reserva = reservas.find(r => r.id === id && r.status === "pendente");
+    if (!reserva) return;
+
+    const livro = encontrarLivro(reserva.livro_id);
+    if (!livro || livro.status !== "available") {
+      await modalAlerta("Esse livro não está mais disponível. Verifique o acervo antes de confirmar.");
+      return;
+    }
+
+    const perfil = reserva.perfis;
+    const sugestao = new Date();
+    sugestao.setDate(sugestao.getDate() + 14);
+    const dataEntrega = dataLocalISO(sugestao);
+
+    livro.status = "reading";
+    livro.reader = perfil?.nome || "Leitor";
+    livro.readerEmail = perfil?.email || "";
+    livro.dataEntrega = dataEntrega;
+
+    const salvou = await saveData();
+    if (!salvou) return;
+
+    const { error } = await supabaseClient
+      .from("reservas")
+      .update({
+        status: "retirada",
+        picked_up_at: new Date().toISOString(),
+        due_date: dataEntrega
+      })
+      .eq("id", id)
+      .eq("status", "pendente");
+
+    if (error) {
+      await loadData();
+      await modalAlerta("O livro foi salvo, mas não foi possível atualizar a solicitação. Verifique o Supabase.");
+      return;
+    }
+
+    await carregarReservas();
+    renderLists();
+    renderMinhaConta();
+    renderReservasAdmin();
+    await modalAlerta(`Retirada registrada para ${livro.reader}. Devolução prevista: ${formatarData(dataEntrega)}.`);
+  }
+
+  async function cancelarReservaAdmin(id) {
+    if (!isAdminLoggedIn) return;
+    const reserva = reservas.find(r => r.id === id && r.status === "pendente");
+    if (!reserva) return;
+
+    const confirmou = await modalConfirmar("Cancelar esta solicitação e liberar o livro para outros usuários?");
+    if (!confirmou) return;
+
+    const { error } = await supabaseClient
+      .from("reservas")
+      .update({ status: "cancelada" })
+      .eq("id", id)
+      .eq("status", "pendente");
+
+    if (error) {
+      await modalAlerta("Não foi possível cancelar a solicitação.");
+      return;
+    }
+
+    await carregarReservas();
+    renderReservasAdmin();
+    renderMinhaConta();
+    renderLists();
+  }
+
+  function renderMinhaConta() {
+    const container = document.getElementById("minhaContaContainer");
+    if (!container) return;
+    container.innerHTML = "";
+
+    if (!currentUserProfile) {
+      container.innerHTML = '<p class="vazio">Entre com sua conta para visualizar seus dados.</p>';
+      return;
+    }
+
+    const p = document.createElement("div");
+    p.className = "perfil-card";
+    p.innerHTML = `
+      <div><strong>Nome:</strong> ${currentUserProfile.nome || "—"}</div>
+      <div><strong>E-mail:</strong> ${currentUserProfile.email || "—"}</div>
+      <div><strong>Tipo:</strong> ${currentUserProfile.tipo === "aluno" ? "Aluno" : currentUserProfile.tipo === "professor" ? "Professor" : "Bibliotecária"}</div>
+      ${currentUserProfile.turma ? `<div><strong>Turma:</strong> ${currentUserProfile.turma}</div>` : ""}
+      ${currentUserProfile.codigo_aluno ? `<div><strong>Código:</strong> ${currentUserProfile.codigo_aluno}</div>` : ""}
+    `;
+    container.appendChild(p);
+
+    const titulo = document.createElement("h3");
+    titulo.textContent = "Minhas solicitações e empréstimos";
+    container.appendChild(titulo);
+
+    const minhas = reservas.filter(r => r.aluno_id === currentSupabaseUser.id);
+    const emprestados = books.filter(b => b.status === "reading" && b.readerEmail === currentSupabaseUser.email);
+
+    if (!minhas.length && !emprestados.length) {
+      const vazio = document.createElement("p");
+      vazio.className = "vazio";
+      vazio.textContent = "Você ainda não possui solicitações ou empréstimos.";
+      container.appendChild(vazio);
+      return;
+    }
+
+    minhas.forEach(r => {
+      const livro = encontrarLivro(r.livro_id);
+      const div = document.createElement("div");
+      div.className = "perfil-card";
+      const status = r.status === "pendente" ? '<span class="status-pendente">Aguardando retirada</span>' : r.status === "retirada" ? '<span class="status-emprestado">Retirado</span>' : `<span class="badge">${r.status}</span>`;
+      div.innerHTML = `<strong>${livro?.title || "Livro removido do acervo"}</strong><br>${status}<br><small>Solicitado em: ${formatarDataHora(r.created_at)}</small>`;
+      if (r.status === "pendente") {
+        const btn = document.createElement("button");
+        btn.className = "btn-perigo";
+        btn.style.width = "auto";
+        btn.style.marginTop = "8px";
+        btn.textContent = "Cancelar solicitação";
+        btn.onclick = () => cancelarMinhaReserva(r.id);
+        div.appendChild(btn);
+      }
+      container.appendChild(div);
+    });
+  }
+
+  function renderReservasAdmin() {
+    const container = document.getElementById("reservasAdminContainer");
+    if (!container) return;
+    container.innerHTML = "";
+    if (!isAdminLoggedIn) return;
+
+    const pendentes = reservas.filter(r => r.status === "pendente");
+    if (!pendentes.length) {
+      container.innerHTML = '<p class="vazio">Nenhuma solicitação aguardando retirada.</p>';
+      return;
+    }
+
+    pendentes.forEach(r => {
+      const livro = encontrarLivro(r.livro_id);
+      const perfil = r.perfis || {};
+      const li = document.createElement("div");
+      li.className = "perfil-card";
+      li.innerHTML = `
+        <strong>${livro?.title || "Livro não encontrado"}</strong><br>
+        👤 ${perfil.nome || "Usuário"}<br>
+        📧 ${perfil.email || "—"}<br>
+        ${perfil.tipo === "aluno" ? `🏫 ${perfil.turma || "Turma não informada"}<br>🔖 ${perfil.codigo_aluno || "—"}` : "👨‍🏫 Professor"}<br>
+        📅 Solicitação: ${formatarDataHora(r.created_at)}
+      `;
+
+      const acoes = document.createElement("div");
+      acoes.className = "acoes";
+      acoes.style.marginTop = "8px";
+      const confirmar = document.createElement("button");
+      confirmar.className = "btn-confirmar";
+      confirmar.textContent = "Dar baixa / Confirmar retirada";
+      confirmar.onclick = () => confirmarRetirada(r.id);
+      const cancelar = document.createElement("button");
+      cancelar.className = "btn-perigo";
+      cancelar.textContent = "Cancelar";
+      cancelar.onclick = () => cancelarReservaAdmin(r.id);
+      acoes.appendChild(confirmar);
+      acoes.appendChild(cancelar);
+      li.appendChild(acoes);
+      container.appendChild(li);
+    });
+  }
+
+  async function renderUsuariosAdmin() {
+    const container = document.getElementById("usuariosAdminContainer");
+    if (!container || !isAdminLoggedIn) return;
+    container.innerHTML = '<p class="vazio">Carregando usuários...</p>';
+
+    const { data, error } = await supabaseClient
+      .from("perfis")
+      .select("id,nome,email,tipo,turma,codigo_aluno,data_nascimento,telefone,endereco")
+      .order("nome", { ascending: true });
+
+    if (error) {
+      container.innerHTML = '<p class="vazio">Não foi possível carregar os usuários.</p>';
+      console.error(error);
+      return;
+    }
+
+    container.innerHTML = "";
+    if (!data.length) {
+      container.innerHTML = '<p class="vazio">Nenhum usuário cadastrado.</p>';
+      return;
+    }
+
+    data.forEach(u => {
+      const div = document.createElement("div");
+      div.className = "perfil-card";
+      div.innerHTML = `
+        <strong>${u.nome}</strong><br>
+        ${u.tipo === "aluno" ? "👩‍🎓 Aluno" : u.tipo === "professor" ? "👨‍🏫 Professor" : "👩‍💼 Bibliotecária"}<br>
+        📧 ${u.email}<br>
+        ${u.turma ? `🏫 Turma: ${u.turma}<br>` : ""}
+        ${u.codigo_aluno ? `🔖 Código: ${u.codigo_aluno}<br>` : ""}
+        📞 ${u.telefone || "Não informado"}
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  function renderAll() {
+    popularSelectsDeGenero();
+    renderLists();
+    renderLibraryEmailsForm();
+    renderContactRecipients();
+    renderMinhaConta();
+    renderReservasAdmin();
+    renderUsuariosAdmin();
+    document.getElementById("bookLimitInput").value = bookLimit;
+  }
+
+  // ---- Abas ----
+  document.getElementById("abaInicioBtn").addEventListener("click", () => trocarAba("abaInicio", "abaInicioBtn"));
+  document.getElementById("abaLendoBtn").addEventListener("click", () => trocarAba("abaLendo", "abaLendoBtn"));
+  document.getElementById("abaAtrasadosBtn").addEventListener("click", () => trocarAba("abaAtrasados", "abaAtrasadosBtn"));
+  document.getElementById("abaContatoBtn").addEventListener("click", () => trocarAba("abaContato", "abaContatoBtn"));
+  document.getElementById("abaMinhaContaBtn").addEventListener("click", () => trocarAba("abaMinhaConta", "abaMinhaContaBtn"));
+
+  function trocarAba(idConteudo, idBotao) {
+    document.querySelectorAll(".conteudo-aba").forEach(el => el.classList.remove("ativa"));
+    document.querySelectorAll(".aba-btn").forEach(el => el.classList.remove("ativa"));
+    document.getElementById(idConteudo).classList.add("ativa");
+    document.getElementById(idBotao).classList.add("ativa");
+  }
+
+  function popularSelectsDeGenero() {
+    const newBookGenero = document.getElementById("newBookGenero");
+    const filtroGenero = document.getElementById("filtroGenero");
+
+    newBookGenero.innerHTML = "";
+    GENEROS.forEach(g => {
+      const option = document.createElement("option");
+      option.value = g;
+      option.textContent = g;
+      newBookGenero.appendChild(option);
+    });
+
+    filtroGenero.innerHTML = "";
+    const optTodos = document.createElement("option");
+    optTodos.value = "Todos";
+    optTodos.textContent = "Todos os gêneros";
+    filtroGenero.appendChild(optTodos);
+    GENEROS.forEach(g => {
+      const option = document.createElement("option");
+      option.value = g;
+      option.textContent = g;
+      filtroGenero.appendChild(option);
+    });
+  }
+
+  // Data de hoje no fuso do navegador (toISOString usa UTC e, no Brasil,
+  // passava pro dia seguinte a partir das 21h).
+  function dataLocalISO(d) {
+    const ano = d.getFullYear();
+    const mes = String(d.getMonth() + 1).padStart(2, "0");
+    const dia = String(d.getDate()).padStart(2, "0");
+    return `${ano}-${mes}-${dia}`;
+  }
+
+  function formatarData(iso) {
+    if (!iso) return "sem data definida";
+    const [ano, mes, dia] = iso.split("-");
+    return `${dia}/${mes}/${ano}`;
+  }
+
+  function diasDeAtraso(iso) {
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+    const entrega = new Date(iso + "T00:00:00");
+    const diffMs = hoje - entrega;
+    return Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  }
+
+  function renderLists() {
+    popularFiltroAutor();
+    renderDisponiveis();
+    renderEmprestados();
+    renderAtrasados();
+    renderEstatisticas();
+  }
+
+  function popularFiltroAutor() {
+    const filtroAutor = document.getElementById("filtroAutor");
+    const valorAtual = filtroAutor.value || "Todos";
+
+    const autoresDisponiveis = [...new Set(
+      books.filter(b => b.status === "available" && b.autor && b.autor.trim())
+        .map(b => b.autor.trim())
+    )].sort((a, b) => a.localeCompare(b, "pt-BR"));
+
+    filtroAutor.innerHTML = "";
+    const optTodos = document.createElement("option");
+    optTodos.value = "Todos";
+    optTodos.textContent = "Todos os autores";
+    filtroAutor.appendChild(optTodos);
+    autoresDisponiveis.forEach(autor => {
+      const option = document.createElement("option");
+      option.value = autor;
+      option.textContent = autor;
+      filtroAutor.appendChild(option);
+    });
+
+    if ([...filtroAutor.options].some(o => o.value === valorAtual)) {
+      filtroAutor.value = valorAtual;
+    }
+  }
+
+  function renderEstatisticas() {
+    const container = document.getElementById("estatisticasContainer");
+    if (!container) return;
+
+    const total = books.length;
+    const disponiveis = books.filter(b => b.status === "available").length;
+    const emprestados = books.filter(b => b.status === "reading").length;
+    const atrasados = books.filter(b => b.status === "reading" && b.dataEntrega && diasDeAtraso(b.dataEntrega) > 0).length;
+    const totalNaFila = books.reduce((soma, b) => soma + ((b.fila || []).length), 0);
+
+    const contagemGeneros = {};
+    books.forEach(b => {
+      const g = b.genero || "Outro";
+      contagemGeneros[g] = (contagemGeneros[g] || 0) + 1;
+    });
+    let generoTopo = "—";
+    let maiorContagem = 0;
+    for (const g in contagemGeneros) {
+      if (contagemGeneros[g] > maiorContagem) {
+        maiorContagem = contagemGeneros[g];
+        generoTopo = g;
+      }
+    }
+
+    container.innerHTML = "";
+    const grid = document.createElement("div");
+    grid.className = "estatisticas-grid";
+
+    const cards = [
+      { numero: total, rotulo: "Livros no total" },
+      { numero: disponiveis, rotulo: "Disponíveis" },
+      { numero: emprestados, rotulo: "Emprestados" },
+      { numero: atrasados, rotulo: "Atrasados" },
+      { numero: totalNaFila, rotulo: "Pessoas na fila de espera" },
+      { numero: generoTopo, rotulo: "Gênero mais comum" }
+    ];
+
+    cards.forEach(c => {
+      const card = document.createElement("div");
+      card.className = "card-estatistica";
+      const numero = document.createElement("span");
+      numero.className = "numero";
+      numero.textContent = c.numero;
+      const rotulo = document.createElement("span");
+      rotulo.className = "rotulo";
+      rotulo.textContent = c.rotulo;
+      card.appendChild(numero);
+      card.appendChild(rotulo);
+      grid.appendChild(card);
+    });
+
+    container.appendChild(grid);
+  }
+
+  function renderDisponiveis() {
+    const container = document.getElementById("availableBooksContainer");
+    const filtro = document.getElementById("filtroGenero").value || "Todos";
+    const filtroAutorValor = document.getElementById("filtroAutor").value || "Todos";
+    const busca = document.getElementById("buscaTitulo").value.trim().toLowerCase();
+    container.innerHTML = "";
+
+    const disponiveis = books.filter(b =>
+      b.status === "available" &&
+      (filtro === "Todos" || b.genero === filtro) &&
+      (filtroAutorValor === "Todos" || (b.autor && b.autor.trim() === filtroAutorValor)) &&
+      (busca === "" || b.title.toLowerCase().includes(busca) || (b.autor && b.autor.toLowerCase().includes(busca)))
+    );
+
+    if (disponiveis.length === 0) {
+      container.innerHTML = '<p class="vazio">Nenhum livro disponível nesse filtro/busca no momento.</p>';
+      return;
+    }
+
+    const generosPresentes = GENEROS.filter(g => disponiveis.some(b => b.genero === g));
+    const semGenero = disponiveis.filter(b => !GENEROS.includes(b.genero));
+
+    generosPresentes.forEach(genero => {
+      const titulo = document.createElement("h3");
+      titulo.className = "genero-titulo";
+      titulo.textContent = genero;
+      container.appendChild(titulo);
+
+      const ul = document.createElement("ul");
+      disponiveis.filter(b => b.genero === genero).forEach(book => ul.appendChild(criarItemDisponivel(book)));
+      container.appendChild(ul);
+    });
+
+    if (semGenero.length > 0) {
+      const titulo = document.createElement("h3");
+      titulo.className = "genero-titulo";
+      titulo.textContent = "Outro";
+      container.appendChild(titulo);
+      const ul = document.createElement("ul");
+      semGenero.forEach(book => ul.appendChild(criarItemDisponivel(book)));
+      container.appendChild(ul);
+    }
+  }
+
+  function criarItemDisponivel(book) {
+    const li = document.createElement("li");
+    li.className = "item-disponivel";
+
+    const linhaPrincipal = document.createElement("div");
+    linhaPrincipal.className = "linha-principal";
+
+    const infoTitulo = document.createElement("span");
+    const tituloTexto = document.createElement("span");
+    tituloTexto.textContent = book.title;
+    infoTitulo.appendChild(tituloTexto);
+    if (book.autor && book.autor.trim()) {
+      const autorTexto = document.createElement("span");
+      autorTexto.className = "autor-texto";
+      autorTexto.textContent = book.autor.trim();
+      infoTitulo.appendChild(autorTexto);
+    }
+    linhaPrincipal.appendChild(infoTitulo);
+
+    const acoes = document.createElement("div");
+    acoes.className = "acoes";
+
+    const solicitarBtn = document.createElement("button");
+    solicitarBtn.className = "btn-confirmar";
+    solicitarBtn.textContent = "Solicitar retirada";
+    solicitarBtn.onclick = () => solicitarLivro(book.id);
+    acoes.appendChild(solicitarBtn);
+
+    if (isAdminLoggedIn) {
+      const editBtn = document.createElement("button");
+      editBtn.className = "btn-secundario";
+      editBtn.textContent = "Editar";
+      editBtn.onclick = () => editarLivro(book.id);
+
+      const delBtn = document.createElement("button");
+      delBtn.className = "btn-perigo";
+      delBtn.textContent = "Remover";
+      delBtn.onclick = () => removerLivro(book.id);
+
+      acoes.appendChild(editBtn);
+      acoes.appendChild(delBtn);
+    }
+
+    linhaPrincipal.appendChild(acoes);
+    li.appendChild(linhaPrincipal);
+    return li;
+  }
+
+  function renderEmprestados() {
+    const readingList = document.getElementById("readingBooksList");
+    readingList.innerHTML = "";
+    const lendo = books.filter(b => b.status === "reading");
+
+    if (lendo.length === 0) {
+      readingList.innerHTML = '<li class="vazio">Nenhum livro emprestado no momento.</li>';
+      return;
+    }
+
+    lendo.forEach(book => {
+      const fila = book.fila || [];
+      const li = document.createElement("li");
+      li.className = "item-disponivel";
+
+      const linhaPrincipal = document.createElement("div");
+      linhaPrincipal.className = "linha-principal";
+
+      const span = document.createElement("span");
+      const autorTexto = book.autor && book.autor.trim() ? ` (${book.autor.trim()})` : "";
+      span.textContent = `${book.title}${autorTexto} — Com: ${book.reader} — Devolução: ${formatarData(book.dataEntrega)}`;
+      linhaPrincipal.appendChild(span);
+
+      const acoes = document.createElement("div");
+      acoes.className = "acoes";
+
+      if (fila.length > 0) {
+        const badgeFila = document.createElement("span");
+        badgeFila.className = "badge";
+        badgeFila.textContent = `${fila.length} na fila`;
+        acoes.appendChild(badgeFila);
+      }
+
+      const filaBtn = document.createElement("button");
+      filaBtn.className = "btn-secundario";
+      filaBtn.textContent = "Entrar na fila";
+      acoes.appendChild(filaBtn);
+
+      // A devolução é só da bibliotecária — evita bagunça/devoluções falsas.
+      if (isAdminLoggedIn) {
+        const dateInput = document.createElement("input");
+        dateInput.type = "date";
+        dateInput.value = book.dataEntrega || "";
+
+        const saveDateBtn = document.createElement("button");
+        saveDateBtn.className = "btn-secundario";
+        saveDateBtn.textContent = "Salvar data";
+        saveDateBtn.onclick = () => salvarDataEntrega(book.id, dateInput.value);
+
+        acoes.appendChild(dateInput);
+        acoes.appendChild(saveDateBtn);
+
+        const concluirBtn = document.createElement("button");
+        concluirBtn.className = "btn-confirmar";
+        concluirBtn.textContent = "Registrar Devolução";
+        concluirBtn.onclick = () => concluirLeitura(book.id);
+        acoes.appendChild(concluirBtn);
+      }
+
+      linhaPrincipal.appendChild(acoes);
+      li.appendChild(linhaPrincipal);
+
+      // Formulário inline pra entrar na fila de espera
+      const formFila = document.createElement("div");
+      formFila.className = "agendar-inline";
+
+      const nomeInput = document.createElement("input");
+      nomeInput.type = "text";
+      nomeInput.placeholder = "Seu nome";
+
+      const emailInput = document.createElement("input");
+      emailInput.type = "email";
+      emailInput.placeholder = "Seu email (pra avisar quando o livro voltar)";
+
+      const confirmarFilaBtn = document.createElement("button");
+      confirmarFilaBtn.className = "btn-confirmar";
+      confirmarFilaBtn.textContent = "Confirmar";
+
+      const cancelarFilaBtn = document.createElement("button");
+      cancelarFilaBtn.className = "btn-secundario";
+      cancelarFilaBtn.textContent = "Cancelar";
+
+      const erroFilaSpan = document.createElement("span");
+      erroFilaSpan.className = "erro-inline";
+
+      formFila.appendChild(nomeInput);
+      formFila.appendChild(emailInput);
+      formFila.appendChild(confirmarFilaBtn);
+      formFila.appendChild(cancelarFilaBtn);
+      formFila.appendChild(erroFilaSpan);
+      li.appendChild(formFila);
+
+      filaBtn.onclick = () => {
+        formFila.classList.toggle("aberto");
+        if (formFila.classList.contains("aberto")) nomeInput.focus();
+      };
+      cancelarFilaBtn.onclick = () => {
+        formFila.classList.remove("aberto");
+        nomeInput.value = "";
+        emailInput.value = "";
+        erroFilaSpan.classList.remove("visivel");
+      };
+      confirmarFilaBtn.onclick = () => entrarNaFila(book.id, nomeInput.value, emailInput.value, erroFilaSpan);
+
+      readingList.appendChild(li);
+    });
+  }
+
+  async function entrarNaFila(id, nomeDigitado, emailDigitado, erroSpan) {
+    const book = books.find(b => b.id === id);
+    if (!book) return;
+
+    const nome = (nomeDigitado || "").trim();
+    const email = (emailDigitado || "").trim();
+    if (!nome || !email) {
+      if (erroSpan) {
+        erroSpan.textContent = "Preencha seu nome e email pra entrar na fila.";
+        erroSpan.classList.add("visivel");
+      }
+      return;
+    }
+    if (erroSpan) erroSpan.classList.remove("visivel");
+
+    if (!book.fila) book.fila = [];
+    book.fila.push({ name: nome, email: email });
+    await saveData();
+    renderLists();
+    await modalAlerta(`Pronto! Você está na fila de espera de "${book.title}". Avisamos por email assim que ele voltar.`);
+  }
+
+  function renderAtrasados() {
+    const lateList = document.getElementById("lateBooksList");
+    lateList.innerHTML = "";
+    const atrasados = books.filter(b => b.status === "reading" && b.dataEntrega && diasDeAtraso(b.dataEntrega) > 0);
+
+    if (atrasados.length === 0) {
+      lateList.innerHTML = '<li class="vazio">Nenhuma devolução atrasada no momento.</li>';
+      return;
+    }
+
+    atrasados.forEach(book => {
+      const dias = diasDeAtraso(book.dataEntrega);
+      const li = document.createElement("li");
+      li.className = "atrasado";
+      const span = document.createElement("span");
+      const autorTexto = book.autor && book.autor.trim() ? ` (${book.autor.trim()})` : "";
+      span.textContent = `${book.title}${autorTexto} — Com: ${book.reader} — Devolução prevista: ${formatarData(book.dataEntrega)}`;
+      const badge = document.createElement("span");
+      badge.className = "badge badge-atraso";
+      badge.textContent = `${dias} dia${dias > 1 ? "s" : ""} de atraso`;
+      li.appendChild(span);
+      li.appendChild(badge);
+      lateList.appendChild(li);
+    });
+  }
+
+  function renderLibraryEmailsForm() {
+    const container = document.getElementById("libraryEmailsForm");
+    container.innerHTML = "";
+    libraryEmails.forEach((entry, idx) => {
+      const linha = document.createElement("div");
+      linha.className = "linha-email";
+
+      const nomeInput = document.createElement("input");
+      nomeInput.type = "text";
+      nomeInput.placeholder = "Nome";
+      nomeInput.value = entry.name || "";
+      nomeInput.dataset.idx = idx;
+      nomeInput.dataset.campo = "name";
+
+      const emailInput = document.createElement("input");
+      emailInput.type = "email";
+      emailInput.placeholder = "email@escola.gov.br";
+      emailInput.value = entry.email || "";
+      emailInput.dataset.idx = idx;
+      emailInput.dataset.campo = "email";
+
+      const removerBtn = document.createElement("button");
+      removerBtn.type = "button";
+      removerBtn.className = "btn-perigo";
+      removerBtn.textContent = "Remover";
+      removerBtn.onclick = () => {
+        libraryEmails.splice(idx, 1);
+        renderLibraryEmailsForm();
+      };
+
+      linha.appendChild(nomeInput);
+      linha.appendChild(emailInput);
+      linha.appendChild(removerBtn);
+      container.appendChild(linha);
+    });
+  }
+
+  document.getElementById("addEmailBtn").addEventListener("click", () => {
+    libraryEmails.push({ name: "", email: "" });
+    renderLibraryEmailsForm();
+  });
+
+  function renderContactRecipients() {
+    const select = document.getElementById("contactRecipient");
+    select.innerHTML = "";
+
+    const optAll = document.createElement("option");
+    optAll.value = "all";
+    optAll.textContent = "Todas as bibliotecárias";
+    select.appendChild(optAll);
+
+    libraryEmails.forEach((entry, idx) => {
+      const option = document.createElement("option");
+      option.value = idx;
+      option.textContent = entry.name || entry.email;
+      select.appendChild(option);
+    });
+  }
+
+  async function editarLivro(id) {
+    const book = books.find(b => b.id === id);
+    if (!book) return;
+
+    const novoTitulo = await modalPrompt("Novo título do livro:", book.title);
+    if (novoTitulo === null) return;
+    const tituloFinal = novoTitulo.trim() ? novoTitulo.trim() : book.title;
+
+    const novoAutor = await modalPrompt("Autor do livro (deixe em branco se não souber):", book.autor || "");
+    const autorFinal = novoAutor === null ? (book.autor || "") : novoAutor.trim();
+
+    const listaGeneros = GENEROS.join(", ");
+    const novoGenero = await modalPrompt(`Novo gênero do livro. Escolha um destes:\n${listaGeneros}`, book.genero || "Outro");
+
+    let generoFinal = book.genero || "Outro";
+    if (novoGenero && novoGenero.trim()) {
+      const generoDigitado = novoGenero.trim();
+      const encontrado = GENEROS.find(g => g.toLowerCase() === generoDigitado.toLowerCase());
+      if (encontrado) {
+        generoFinal = encontrado;
+      } else {
+        await modalAlerta(`Gênero "${generoDigitado}" não está na lista. O gênero foi mantido como "${generoFinal}".`);
+      }
+    }
+
+    book.title = tituloFinal;
+    book.autor = autorFinal;
+    book.genero = generoFinal;
+    await saveData();
+    renderLists();
+  }
+
+async function removerLivro(id) {
+  if (!isAdminLoggedIn) {
+    await modalAlerta("Somente a bibliotecária pode remover livros.");
+    return;
+  }
+
+  const book = books.find(b => b.id === id);
+
+  if (!book) {
+    await modalAlerta("Livro não encontrado.");
+    return;
+  }
+
+  const confirmou = await modalConfirmar(
+    `Tem certeza que deseja remover permanentemente o livro "${book.title}" da biblioteca?`
+  );
+
+  if (!confirmou) {
+    return;
+  }
+
+  // Guarda uma cópia antes de alterar.
+  const livrosAnteriores = [...books];
+
+  // Remove o livro da lista.
+  books = books.filter(b => b.id !== id);
+
+  // Tenta salvar a nova lista no Supabase.
+  const salvou = await saveData();
+
+  if (!salvou) {
+    // Se deu erro, restaura a lista anterior.
+    books = livrosAnteriores;
+
+    renderLists();
+
+    await modalAlerta(
+      `O livro "${book.title}" NÃO foi removido porque não foi possível salvar a alteração.`
+    );
+
+    return;
+  }
+
+  // Só chega aqui se o Supabase confirmou o salvamento.
+  renderLists();
+
+  await modalAlerta(
+    `O livro "${book.title}" foi removido permanentemente da biblioteca.`
+  );
+}
+
+  async function concluirLeitura(id) {
+    if (!isAdminLoggedIn) { await modalAlerta("Somente a bibliotecária pode registrar devoluções."); return; }
+    const book = books.find(b => b.id === id);
+    if (!book) return;
+
+    const tituloLivro = book.title;
+    const nomeDoLeitor = book.reader || "aluno(a)";
+    const dataDevolucaoFormatada = formatarData(dataLocalISO(new Date()));
+    let emailDoLeitor = (book.readerEmail || "").trim();
+
+    // Empréstimos feitos antes de existir o campo de email não têm email guardado.
+    // Nesse caso a bibliotecária pode digitar o email do aluno na hora (ou pular).
+    if (!emailValido(emailDoLeitor)) {
+      const digitado = await modalPrompt(
+        `O empréstimo de "${tituloLivro}" não tem o email de ${nomeDoLeitor} guardado. Digite o email do aluno pra enviar o comprovante (ou deixe em branco pra enviar só pra bibliotecária):`
+      );
+      if (digitado === null) return; // cancelou: não registra a devolução
+      emailDoLeitor = digitado.trim();
+      if (emailDoLeitor && !emailValido(emailDoLeitor)) {
+        await modalAlerta("Esse email não parece válido. A devolução não foi registrada — tente de novo.");
+        return;
+      }
+    }
+
+    // Registra a devolução e SALVA primeiro. Só depois manda os emails,
+    // pra não avisar ninguém de uma devolução que acabou não sendo salva.
+    book.status = "available";
+    delete book.reader;
+    delete book.readerEmail;
+    delete book.dataEntrega;
+
+    const proximoDaFila = (book.fila && book.fila.length > 0) ? book.fila.shift() : null;
+
+    const salvou = await saveData();
+    if (!salvou) {
+      await loadData(); // desfaz a alteração local, volta ao que está salvo
+      return;
+    }
+    await carregarReservas();
+    renderLists();
+    renderMinhaConta();
+    renderReservasAdmin();
+
+    // Comprovante: vai pro aluno E pra(s) bibliotecária(s), num único envio.
+    const emailsBibliotecarias = libraryEmails.map(e => (e.email || "").trim()).filter(emailValido);
+    const destinatarios = [...new Set(
+      [emailDoLeitor, ...emailsBibliotecarias].filter(emailValido).map(e => e.toLowerCase())
+    )];
+
+    let avisoComprovante = "";
+    if (destinatarios.length > 0) {
+      const registradoPor = currentSupabaseUser && currentSupabaseUser.email ? ` Registrado por: ${currentSupabaseUser.email}.` : "";
+      const enviado = await enviarEmailAutomatico({
+        paraEmail: destinatarios.join(", "),
+        mensagem: `Comprovante de devolução — Biblioteca Virtual (E.E. Bárbara Heliodora). Aluno(a): ${nomeDoLeitor}. Livro: "${tituloLivro}". Data da devolução: ${dataDevolucaoFormatada}.${registradoPor} Obrigado por devolver e cuidar bem dos livros da nossa biblioteca!`
+      });
+      if (enviado) {
+        avisoComprovante = emailDoLeitor
+          ? ` Comprovante enviado para ${nomeDoLeitor} e para a(s) bibliotecária(s).`
+          : ` Comprovante enviado só para a(s) bibliotecária(s) (sem email do aluno).`;
+      } else {
+        avisoComprovante = ` ATENÇÃO: o comprovante NÃO foi enviado (${ultimoErroEmail}).`;
+      }
+    } else {
+      avisoComprovante = " Nenhum email válido para enviar o comprovante.";
+    }
+
+    // Se tem gente esperando na fila, avisa o primeiro por email
+    let avisoFila = "";
+    if (proximoDaFila) {
+      const enviado = await enviarEmailAutomatico({
+        paraEmail: proximoDaFila.email,
+        mensagem: `Olá, ${proximoDaFila.name}! O livro "${tituloLivro}" que você estava esperando já está disponível na Biblioteca Virtual. Corre lá agendar antes que outra pessoa pegue!`
+      });
+      avisoFila = enviado
+        ? ` ${proximoDaFila.name} (fila de espera) foi avisado(a) por email.`
+        : ` Não foi possível avisar ${proximoDaFila.name} por email (${ultimoErroEmail}).`;
+    }
+
+    await modalAlerta(`Devolução registrada.${avisoComprovante}${avisoFila}`);
+  }
+
+  async function salvarDataEntrega(id, novaData) {
+    if (!isAdminLoggedIn) { await modalAlerta("Somente a bibliotecária pode alterar a data de entrega."); return; }
+    const book = books.find(b => b.id === id);
+    if (!book) return;
+    if (!novaData) { await modalAlerta("Escolha uma data válida."); return; }
+    book.dataEntrega = novaData;
+    await saveData();
+    renderLists();
+  }
+
+  // Ícone da bibliotecária
+  document.getElementById("trigger").addEventListener("click", () => {
+    if (isAdminLoggedIn) {
+      const painel = document.getElementById("painelAdmin");
+      painel.style.display = painel.style.display === "block" ? "none" : "block";
+      renderReservasAdmin();
+      renderUsuariosAdmin();
+    } else {
+      const login = document.getElementById("loginPanel");
+      login.style.display = login.style.display === "block" ? "none" : "block";
+    }
+  });
+
+  document.getElementById("usuarioLoginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("usuarioEmail").value.trim().toLowerCase();
+    const password = document.getElementById("usuarioPassword").value;
+    const feedback = document.getElementById("usuarioLoginFeedback");
+    const btn = e.target.querySelector("button[type=\"submit\"]");
+
+    if (!(emailAlunoValido(email) || emailProfessorValido(email))) {
+      feedback.textContent = "Use um e-mail @aluno.mg.gov.br ou @educacao.mg.gov.br.";
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Entrando...";
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      feedback.textContent = error.message.toLowerCase().includes("email not confirmed")
+        ? "Confirme seu e-mail antes de entrar."
+        : "E-mail ou senha incorretos.";
+    } else {
+      e.target.reset();
+      feedback.textContent = "";
+      await atualizarSessaoAdmin(data.session);
+      trocarAba("abaMinhaConta", "abaMinhaContaBtn");
+    }
+
+    btn.disabled = false;
+    btn.textContent = "Entrar";
+  });
+
+  document.getElementById("cadastroTipo").addEventListener("change", () => {
+    document.getElementById("dadosAluno").style.display =
+      document.getElementById("cadastroTipo").value === "aluno" ? "block" : "none";
+  });
+
+  document.getElementById("abrirCadastroBtn").addEventListener("click", () => {
+    document.getElementById("usuarioPanel").style.display = "none";
+    document.getElementById("cadastroPanel").style.display = "block";
+  });
+
+  document.getElementById("voltarLoginBtn").addEventListener("click", () => {
+    document.getElementById("cadastroPanel").style.display = "none";
+    document.getElementById("usuarioPanel").style.display = "block";
+  });
+
+  document.getElementById("cadastroForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const nome = document.getElementById("cadastroNome").value.trim();
+    const tipo = document.getElementById("cadastroTipo").value;
+    const turma = document.getElementById("cadastroTurma").value.trim();
+    const nascimento = document.getElementById("cadastroNascimento").value;
+    const endereco = document.getElementById("cadastroEndereco").value.trim();
+    const telefone = document.getElementById("cadastroTelefone").value.trim();
+    const email = document.getElementById("cadastroEmail").value.trim().toLowerCase();
+    const senha = document.getElementById("cadastroSenha").value;
+    const feedback = document.getElementById("cadastroFeedback");
+    const btn = e.target.querySelector("button[type=\"submit\"]");
+
+    if (!nome || !tipo || !email || !senha) {
+      feedback.textContent = "Preencha os campos obrigatórios.";
+      return;
+    }
+
+    if (tipo === "aluno" && !emailAlunoValido(email)) {
+      feedback.textContent = "Aluno deve usar um e-mail @aluno.mg.gov.br.";
+      return;
+    }
+
+    if (tipo === "professor" && !emailProfessorValido(email)) {
+      feedback.textContent = "Professor deve usar um e-mail @educacao.mg.gov.br.";
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Criando...";
+
+    const { data, error } = await supabaseClient.auth.signUp({
+      email,
+      password: senha,
+      options: {
+        data: {
+          nome,
+          tipo,
+          turma: tipo === "aluno" ? turma : null,
+          data_nascimento: nascimento || null,
+          telefone: telefone || null,
+          endereco: endereco || null
+        }
+      }
+    });
+
+    if (error) {
+      feedback.textContent = "Não foi possível criar o cadastro: " + error.message;
+    } else {
+      e.target.reset();
+      document.getElementById("dadosAluno").style.display = "none";
+      feedback.textContent = data.session
+        ? "Cadastro criado! Você já pode entrar."
+        : "Cadastro criado! Verifique seu e-mail para confirmar a conta.";
+    }
+
+    btn.disabled = false;
+    btn.textContent = "Criar cadastro";
+  });
+
+  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("adminEmail").value.trim().toLowerCase();
+    const password = document.getElementById("adminPassword").value;
+    const feedback = document.getElementById("loginFeedback");
+    const btn = e.target.querySelector("button[type=\"submit\"]");
+
+    if (email !== "bibliotecavirtualbh@gmail.com") {
+      feedback.textContent = "Somente o e-mail da biblioteca pode entrar como bibliotecária.";
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Entrando...";
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      feedback.textContent = error.message.toLowerCase().includes("email not confirmed")
+        ? "Esse email ainda não foi confirmado."
+        : "Email ou senha incorretos.";
+    } else {
+      document.getElementById("adminPassword").value = "";
+      feedback.textContent = "";
+      await atualizarSessaoAdmin(data.session);
+    }
+
+    btn.disabled = false;
+    btn.textContent = "Entrar";
+  });
+
+  document.getElementById("logoutUsuarioBtn").addEventListener("click", async () => {
+    const confirmou = await modalConfirmar("Sair da sua conta?");
+    if (!confirmou) return;
+    await supabaseClient.auth.signOut();
+    trocarAba("abaInicio", "abaInicioBtn");
+  });
+
+  document.getElementById("addBookForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!isAdminLoggedIn) { await modalAlerta("Somente a bibliotecária pode adicionar livros."); return; }
+    const newTitle = document.getElementById("newBookTitle").value.trim();
+    const newAutor = document.getElementById("newBookAutor").value.trim();
+    const newGenero = document.getElementById("newBookGenero").value;
+    if (newTitle) {
+      const newId = books.length ? Math.max(...books.map(b => b.id)) + 1 : 1;
+      books.push({ id: newId, title: newTitle, autor: newAutor, genero: newGenero, status: "available" });
+      await saveData();
+      await modalAlerta(`Livro "${newTitle}" adicionado com sucesso.`);
+      renderLists();
+      e.target.reset();
+    }
+  });
+
+  // ---- Leitor de código de barras (ISBN) / QR Code ----
+  // A biblioteca html5-qrcode (bem pesada) só é carregada quando a
+  // bibliotecária clica em "Escanear" — assim a página não fica lenta
+  // pra quem só vem consultar os livros (a grande maioria das visitas).
+  let scannerAtivo = null;
+  let html5QrcodeCarregado = false;
+
+  function carregarScriptScanner() {
+    return new Promise((resolve, reject) => {
+      if (html5QrcodeCarregado) { resolve(); return; }
+      const script = document.createElement("script");
+      script.src = "https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js";
+      script.onload = () => { html5QrcodeCarregado = true; resolve(); };
+      script.onerror = () => reject(new Error("Falha ao carregar o leitor de código de barras."));
+      document.head.appendChild(script);
+    });
+  }
+
+  document.getElementById("scanBtn").addEventListener("click", async () => {
+    if (!isAdminLoggedIn) { await modalAlerta("Somente a bibliotecária pode escanear livros."); return; }
+
+    const container = document.getElementById("scanContainer");
+    const feedback = document.getElementById("scanFeedback");
+    container.style.display = "block";
+    feedback.textContent = "Carregando o leitor...";
+
+    try {
+      await carregarScriptScanner();
+    } catch (err) {
+      console.error(err);
+      feedback.textContent = "Não foi possível carregar o leitor. Verifique sua conexão com a internet.";
+      return;
+    }
+
+    feedback.textContent = "Aponte a câmera para o código de barras (ISBN) na contracapa do livro.";
+
+    try {
+      scannerAtivo = new Html5Qrcode("scanReader");
+      await scannerAtivo.start(
+        { facingMode: "environment" },
+        {
+          fps: 10,
+          qrbox: { width: 250, height: 150 },
+          formatsToSupport: [
+            Html5QrcodeSupportedFormats.EAN_13,
+            Html5QrcodeSupportedFormats.EAN_8,
+            Html5QrcodeSupportedFormats.QR_CODE
+          ]
+        },
+        onCodigoLido,
+        () => { /* erro de leitura em cada frame — ignorar, é normal */ }
+      );
+    } catch (err) {
+      console.error("Erro ao acessar a câmera:", err);
+      feedback.textContent = "Não foi possível acessar a câmera. Verifique se você deu permissão ao navegador.";
+    }
+  });
+
+  async function pararScanner() {
+    if (scannerAtivo) {
+      try {
+        await scannerAtivo.stop();
+        scannerAtivo.clear();
+      } catch (err) {
+        console.error("Erro ao parar o scanner:", err);
+      }
+      scannerAtivo = null;
+    }
+    document.getElementById("scanContainer").style.display = "none";
+  }
+
+  document.getElementById("scanCancelBtn").addEventListener("click", pararScanner);
+
+  async function onCodigoLido(codigoLido) {
+    const feedback = document.getElementById("scanFeedback");
+    feedback.textContent = `Código lido: ${codigoLido}. Buscando informações...`;
+    await pararScanner();
+
+    const apenasNumeros = codigoLido.replace(/[^0-9]/g, "");
+    if (apenasNumeros.length < 8) {
+      await modalAlerta(`Código lido: ${codigoLido}. Não parece ser um ISBN válido — preencha os dados manualmente.`);
+      return;
+    }
+
+    try {
+      const resposta = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${apenasNumeros}&format=json&jscmd=data`);
+      const dados = await resposta.json();
+      const info = dados[`ISBN:${apenasNumeros}`];
+
+      if (info) {
+        document.getElementById("newBookTitle").value = info.title || "";
+        document.getElementById("newBookAutor").value = (info.authors && info.authors.length) ? info.authors.map(a => a.name).join(", ") : "";
+        await modalAlerta(`Livro encontrado: "${info.title || "sem título"}". Confira os dados, escolha o gênero e clique em Adicionar Livro.`);
+      } else {
+        await modalAlerta(`Código ${apenasNumeros} lido, mas não encontrei esse livro na base de dados. Preencha o título e autor manualmente.`);
+      }
+    } catch (err) {
+      console.error("Erro ao buscar dados do livro:", err);
+      await modalAlerta(`Código ${apenasNumeros} lido, mas não consegui buscar os dados agora (verifique a internet). Preencha manualmente.`);
+    }
+  }
+
+  document.getElementById("saveEmailsBtn").addEventListener("click", async () => {
+    if (!isAdminLoggedIn) { await modalAlerta("Somente a bibliotecária pode editar os emails."); return; }
+    const inputs = document.querySelectorAll("#libraryEmailsForm input");
+    const novaLista = libraryEmails.map(e => ({ ...e }));
+    inputs.forEach(input => {
+      const idx = parseInt(input.dataset.idx);
+      const campo = input.dataset.campo;
+      if (novaLista[idx]) novaLista[idx][campo] = input.value.trim();
+    });
+    libraryEmails = novaLista.filter(e => e.name || e.email);
+    await saveData();
+    renderLibraryEmailsForm();
+    renderContactRecipients();
+    const feedback = document.getElementById("emailsFeedback");
+    feedback.style.color = "#1b5e20";
+    feedback.textContent = "Emails atualizados com sucesso.";
+  });
+
+  document.getElementById("saveLimitBtn").addEventListener("click", async () => {
+    if (!isAdminLoggedIn) { await modalAlerta("Somente a bibliotecária pode editar o limite."); return; }
+    const novoLimite = parseInt(document.getElementById("bookLimitInput").value);
+    const feedback = document.getElementById("limitFeedback");
+    if (!novoLimite || novoLimite < 1) {
+      feedback.style.color = "#b71c1c";
+      feedback.textContent = "Informe um número válido (mínimo 1).";
+      return;
+    }
+    bookLimit = novoLimite;
+    await saveData();
+    feedback.style.color = "#1b5e20";
+    feedback.textContent = `Limite atualizado para ${bookLimit} livro(s) por leitor.`;
+  });
+
+  document.getElementById("backupBtn").addEventListener("click", async () => {
+    if (!isAdminLoggedIn) { await modalAlerta("Somente a bibliotecária pode baixar o backup."); return; }
+
+    const dadosBackup = {
+      geradoEm: new Date().toISOString(),
+      books: books,
+      libraryEmails: libraryEmails,
+      bookLimit: bookLimit
+    };
+
+    const conteudo = JSON.stringify(dadosBackup, null, 2);
+    const blob = new Blob([conteudo], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const dataFormatada = new Date().toISOString().split("T")[0];
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `backup-biblioteca-${dataFormatada}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById("logoutBtn").addEventListener("click", async () => {
+    const confirmouSaida = await modalConfirmar("Sair da conta da bibliotecária?");
+    if (!confirmouSaida) return;
+
+    const { error } = await supabaseClient.auth.signOut();
+    if (error) {
+      console.error("Erro ao sair:", error);
+      await modalAlerta("Não foi possível sair da conta agora. Tente novamente.");
+      return;
+    }
+
+    await atualizarSessaoAdmin(null);
+    trocarAba("abaInicio", "abaInicioBtn");
+  });
+
+  document.getElementById("filtroGenero").addEventListener("change", renderDisponiveis);
+  document.getElementById("buscaTitulo").addEventListener("input", renderDisponiveis);
+  document.getElementById("filtroAutor").addEventListener("change", renderDisponiveis);
+
+  // Contato: envio via EmailJS, com escolha da bibliotecária destinatária
+  document.getElementById("contactForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = document.getElementById("contactName").value.trim();
+    const email = document.getElementById("contactEmail").value.trim();
+    const message = document.getElementById("contactMessage").value.trim();
+    const recipientValue = document.getElementById("contactRecipient").value;
+    const feedback = document.getElementById("contactFeedback");
+    const submitBtn = document.getElementById("contactSubmitBtn");
+
+    if (!(name && email && message)) {
+      feedback.style.color = "#b71c1c";
+      feedback.textContent = "Por favor, preencha todos os campos.";
+      return;
+    }
+
+    let toEmail;
+    if (recipientValue === "all") {
+      toEmail = libraryEmails.map(e => e.email).join(", ");
+    } else {
+      const entry = libraryEmails[parseInt(recipientValue)];
+      toEmail = entry ? entry.email : libraryEmails.map(e => e.email).join(", ");
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Enviando...";
+    feedback.style.color = "#3a6ea8";
+    feedback.textContent = "Enviando sua mensagem...";
+
+    const enviado = await enviarEmailAutomatico({ paraEmail: toEmail, mensagem: message, nomeRemetente: name, emailRemetente: email });
+    if (enviado) {
+      feedback.style.color = "#1b5e20";
+      feedback.textContent = "Mensagem enviada com sucesso! Obrigado por entrar em contato.";
+      e.target.reset();
+      renderContactRecipients();
+    } else {
+      feedback.style.color = "#b71c1c";
+      feedback.textContent = "Não foi possível enviar a mensagem agora. Tente novamente em instantes.";
+    }
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Enviar Mensagem";
+  });
+
+  // ---- Alternar tema claro/escuro ----
+  const temaBtn = document.getElementById("temaBtn");
+  if (localStorage.getItem("biblioteca-tema") === "escuro") {
+    document.body.classList.add("modo-escuro");
+    temaBtn.textContent = "☀︎︎";
+  }
+  temaBtn.addEventListener("click", () => {
+    document.body.classList.toggle("modo-escuro");
+    const escuro = document.body.classList.contains("modo-escuro");
+    temaBtn.textContent = escuro ? "☀︎︎" : "⏾";
+    localStorage.setItem("biblioteca-tema", escuro ? "escuro" : "claro");
+  });
+
+  inicializarAutenticacao();
+  loadData();
+</script>
+</body>
+</html>
