@@ -1,0 +1,1449 @@
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Biblioteca Virtual — E.E. Bárbara Heliodora</title>
+
+  <link rel="icon" type="image/jpeg" href="logo.jpg" />
+
+  <meta name="description" content="Biblioteca Virtual da E.E. Bárbara Heliodora — consulte o acervo, agende livros e acompanhe empréstimos." />
+  <meta property="og:title" content="Biblioteca Virtual — E.E. Bárbara Heliodora" />
+  <meta property="og:description" content="Consulte o acervo, agende livros e acompanhe empréstimos da biblioteca da escola." />
+  <meta property="og:image" content="https://noxstudio008-del.github.io/biblioteca-virtual/logo.jpg" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Biblioteca Virtual — E.E. Bárbara Heliodora" />
+  <meta name="twitter:description" content="Consulte o acervo, agende livros e acompanhe empréstimos da biblioteca da escola." />
+  <meta name="twitter:image" content="https://noxstudio008-del.github.io/biblioteca-virtual/logo.jpg" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #16255c;
+      position: relative;
+      overflow-x: hidden;
+    }
+    .cabecalho {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+    .logo-escola {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+      border-radius: 50%;
+      background: #ffffff;
+      padding: 4px;
+      flex-shrink: 0;
+    }
+    h1 {
+      color: #ffffff;
+      margin-bottom: 0;
+      font-family: 'Great Vibes', cursive;
+      font-size: 3rem;
+      font-weight: normal;
+    }
+    h2 {
+      color: #1565c0;
+      font-family: 'Great Vibes', cursive;
+      font-size: 1.7rem;
+      font-weight: normal;
+    }
+    h3.genero-titulo {
+      color: #0d47a1;
+      font-size: 1.05rem;
+      margin: 14px 0 6px;
+      border-bottom: 2px solid #d6e4f7;
+      padding-bottom: 4px;
+    }
+    section {
+      background: #fff;
+      padding: 12px 15px;
+      margin-bottom: 16px;
+      border-radius: 16px;
+      box-shadow: 0 0 10px #cfe0f5;
+      border: 1px solid #d6e4f7;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 10px;
+      color: #1a3a5c;
+    }
+    input, select, textarea, button {
+      margin-top: 5px;
+      padding: 6px 8px;
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid #90a9c9;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+      font-size: 0.9rem;
+    }
+    button {
+      background-color: #1565c0;
+      color: white;
+      cursor: pointer;
+      border: none;
+      font-weight: bold;
+    }
+    button:hover {
+      background-color: #0d47a1;
+    }
+    button:disabled {
+      background-color: #9db8db;
+      cursor: not-allowed;
+    }
+    ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    ul li {
+      background: #e3edfb;
+      margin-bottom: 5px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    li.atrasado {
+      background: #fbe3e3;
+      border: 1px solid #e0a3a3;
+    }
+    .badge {
+      background: #d3e3f7;
+      color: #0d47a1;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-weight: bold;
+      font-size: 0.8rem;
+      border: 1px solid #90a9c9;
+      white-space: nowrap;
+    }
+    .badge-atraso {
+      background: #f7d3d3;
+      color: #a10d0d;
+      border: 1px solid #c99090;
+    }
+    .vazio {
+      font-style: italic;
+      color: #5c7ca3;
+    }
+    .acoes {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .acoes button {
+      width: auto;
+      padding: 4px 10px;
+      margin-top: 0;
+      font-size: 0.78rem;
+      border-radius: 999px;
+    }
+    .acoes input[type="date"] {
+      width: auto;
+      margin-top: 0;
+      padding: 4px 8px;
+      font-size: 0.78rem;
+    }
+    .btn-secundario {
+      background: #fff;
+      color: #1565c0;
+      border: 1px solid #1565c0;
+    }
+    .btn-secundario:hover {
+      background: #1565c0;
+      color: #fff;
+    }
+    .btn-perigo {
+      background: #fff;
+      color: #b71c1c;
+      border: 1px solid #b71c1c;
+    }
+    .btn-perigo:hover {
+      background: #b71c1c;
+      color: #fff;
+    }
+    .btn-confirmar {
+      background: #fff;
+      color: #1b5e20;
+      border: 1px solid #1b5e20;
+    }
+    .btn-confirmar:hover {
+      background: #1b5e20;
+      color: #fff;
+    }
+    #loadingMsg {
+      color: #ffffff;
+      font-style: italic;
+    }
+    .filtro-genero {
+      max-width: 260px;
+    }
+    .linha-email {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+    .linha-email input {
+      margin-top: 0;
+      flex: 1;
+      min-width: 140px;
+    }
+    .estatisticas-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .card-estatistica {
+      background: #e3edfb;
+      border-radius: 14px;
+      padding: 10px 14px;
+      min-width: 120px;
+      flex: 1;
+    }
+    .card-estatistica .numero {
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: #0d47a1;
+      display: block;
+    }
+    .card-estatistica .rotulo {
+      font-size: 0.78rem;
+      color: #3a6ea8;
+    }
+    li.item-disponivel {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .linha-principal {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      width: 100%;
+    }
+    .agendar-inline {
+      display: none;
+      width: 100%;
+      margin-top: 8px;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .agendar-inline.aberto {
+      display: flex;
+    }
+    .agendar-inline input {
+      margin-top: 0;
+      flex: 1;
+      min-width: 140px;
+    }
+    .agendar-inline button {
+      width: auto;
+      margin-top: 0;
+      font-size: 0.78rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    /* Navegação em abas */
+    .abas {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.35);
+      flex-wrap: wrap;
+    }
+    .aba-btn {
+      width: auto;
+      background: none;
+      color: #dce8ff;
+      border: none;
+      border-radius: 4px 4px 0 0;
+      padding: 10px 16px;
+      font-weight: bold;
+      margin-top: 0;
+      border-bottom: 3px solid transparent;
+    }
+    .aba-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+    }
+    .aba-btn.ativa {
+      color: #ffffff;
+      border-bottom: 3px solid #ffffff;
+    }
+    .conteudo-aba {
+      display: none;
+    }
+    .conteudo-aba.ativa {
+      display: block;
+    }
+
+    /* Ícone no canto: dá acesso à área da bibliotecária */
+    #trigger {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #0d47a1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 0 6px rgba(13, 71, 161, 0.4);
+      z-index: 50;
+    }
+    #trigger svg {
+      width: 16px;
+      height: 16px;
+      fill: #ffffff;
+    }
+    #painelAdmin, #loginPanel {
+      display: none;
+    }
+    #loginPanel {
+      max-width: 320px;
+    }
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(13, 24, 60, 0.55);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.aberto {
+      display: flex;
+    }
+    .modal-box {
+      background: #fff;
+      border-radius: 18px;
+      padding: 20px;
+      max-width: 360px;
+      width: 100%;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+    .modal-box p {
+      color: #1a3a5c;
+      margin: 0 0 6px;
+      line-height: 1.4;
+    }
+    .modal-box input {
+      margin-top: 8px;
+    }
+    .modal-botoes {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .modal-botoes button {
+      width: auto;
+      flex: 1;
+      margin-top: 0;
+    }
+    .erro-inline {
+      display: none;
+      color: #b71c1c;
+      font-size: 0.78rem;
+      width: 100%;
+      margin-top: -2px;
+    }
+    .erro-inline.visivel {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div id="modalOverlay" class="modal-overlay">
+    <div class="modal-box">
+      <p id="modalMensagem"></p>
+      <input type="text" id="modalInput" style="display:none;" />
+      <div class="modal-botoes">
+        <button type="button" id="modalCancelar" class="btn-secundario">Cancelar</button>
+        <button type="button" id="modalConfirmar" class="btn-confirmar">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="cabecalho">
+    <img src="logo.jpg" alt="Logo da escola" class="logo-escola" />
+    <h1>Biblioteca Virtual</h1>
+  </div>
+  <p id="loadingMsg">Carregando dados salvos...</p>
+
+  <!-- Ícone de acesso à área da bibliotecária, escondido no canto -->
+  <div id="trigger" title="Área da Bibliotecária">
+    <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.9-2.2 4.9-4.9S14.7 2.2 12 2.2 7.1 4.4 7.1 7.1 9.3 12 12 12zm0 2.5c-3.3 0-9.8 1.6-9.8 4.9v2.4h19.6v-2.4c0-3.3-6.5-4.9-9.8-4.9z"/></svg>
+  </div>
+
+  <section id="loginPanel">
+    <h2>Login da Bibliotecária</h2>
+    <form id="loginForm">
+      <label for="adminPassword">Senha:</label>
+      <input type="password" id="adminPassword" required />
+      <button type="submit">Entrar</button>
+    </form>
+    <p id="loginFeedback"></p>
+  </section>
+
+  <section id="painelAdmin">
+    <h2>Estatísticas</h2>
+    <div id="estatisticasContainer"></div>
+
+    <h2 style="margin-top:18px;">Adicionar Livro</h2>
+    <form id="addBookForm">
+      <label for="newBookTitle">Título do Livro:</label>
+      <input type="text" id="newBookTitle" required />
+
+      <label for="newBookAutor">Autor:</label>
+      <input type="text" id="newBookAutor" placeholder="Deixe em branco se não souber" />
+
+      <label for="newBookGenero">Gênero:</label>
+      <select id="newBookGenero" required></select>
+
+      <button type="submit">Adicionar Livro</button>
+    </form>
+
+    <h2 style="margin-top:18px;">Emails das Bibliotecárias</h2>
+    <p style="color:#5c7ca3; font-size:0.85rem; margin-top:-6px;">Esses emails aparecem como opções no formulário de Contato. Edite aqui sempre que precisar trocar algum.</p>
+    <div id="libraryEmailsForm"></div>
+    <button type="button" id="saveEmailsBtn" style="margin-top:10px;">Salvar Emails</button>
+    <p id="emailsFeedback"></p>
+
+    <h2 style="margin-top:18px;">Limite de Livros por Leitor</h2>
+    <p style="color:#5c7ca3; font-size:0.85rem; margin-top:-6px;">Quantos livros a mesma pessoa pode ter emprestados ao mesmo tempo. Padrão: 1.</p>
+    <label for="bookLimitInput" style="margin-top:0;">Limite:</label>
+    <input type="number" id="bookLimitInput" min="1" step="1" />
+    <button type="button" id="saveLimitBtn" style="margin-top:10px;">Salvar Limite</button>
+    <p id="limitFeedback"></p>
+
+    <h2 style="margin-top:18px;">Backup dos Dados</h2>
+    <p style="color:#5c7ca3; font-size:0.85rem; margin-top:-6px;">Baixa uma cópia de segurança de todos os livros e configurações, num arquivo que você pode guardar.</p>
+    <button type="button" id="backupBtn" class="btn-secundario" style="margin-top:6px; width:auto; padding:6px 16px; border-radius:999px;">Baixar backup (.json)</button>
+
+    <button type="button" id="logoutBtn" class="btn-perigo" style="margin-top:18px; width:auto; padding:6px 16px; border-radius:999px;">Sair da conta</button>
+  </section>
+
+  <!-- Navegação principal -->
+  <div class="abas">
+    <button type="button" class="aba-btn ativa" id="abaInicioBtn">Início</button>
+    <button type="button" class="aba-btn" id="abaLendoBtn">Emprestados</button>
+    <button type="button" class="aba-btn" id="abaAtrasadosBtn" style="display:none;">Atrasados</button>
+    <button type="button" class="aba-btn" id="abaContatoBtn">Contato</button>
+  </div>
+
+  <div id="abaInicio" class="conteudo-aba ativa">
+    <section>
+      <h2>Livros Disponíveis para Leitura</h2>
+      <label for="buscaTitulo" style="margin-top:0;">Buscar por título:</label>
+      <input type="text" id="buscaTitulo" placeholder="Digite o nome do livro..." />
+
+      <label for="filtroGenero">Filtrar por gênero:</label>
+      <select id="filtroGenero" class="filtro-genero"></select>
+
+      <label for="filtroAutor">Filtrar por autor:</label>
+      <select id="filtroAutor" class="filtro-genero"></select>
+      <div id="availableBooksContainer" style="margin-top:12px;"></div>
+    </section>
+  </div>
+
+  <div id="abaLendo" class="conteudo-aba">
+    <section>
+      <h2>Livros Emprestados</h2>
+      <ul id="readingBooksList"></ul>
+    </section>
+  </div>
+
+  <div id="abaAtrasados" class="conteudo-aba">
+    <section>
+      <h2>Devoluções Pendentes / Atrasadas</h2>
+      <ul id="lateBooksList"></ul>
+    </section>
+  </div>
+
+  <div id="abaContato" class="conteudo-aba">
+    <section>
+      <h2>Contato com a Biblioteca</h2>
+      <form id="contactForm">
+        <label for="contactName">Nome:</label>
+        <input type="text" id="contactName" required />
+
+        <label for="contactEmail">Email:</label>
+        <input type="email" id="contactEmail" required />
+
+        <label for="contactRecipient">Enviar mensagem para:</label>
+        <select id="contactRecipient" required></select>
+
+        <label for="contactMessage">Mensagem:</label>
+        <textarea id="contactMessage" rows="4" required></textarea>
+
+        <button type="submit" id="contactSubmitBtn">Enviar Mensagem</button>
+      </form>
+      <p id="contactFeedback"></p>
+    </section>
+  </div>
+
+<script>
+  // ---- Modal estilizado (substitui alert/confirm/prompt nativos do navegador) ----
+  function abrirModal({ mensagem, comInput = false, valorInicial = "", comCancelar = true, textoConfirmar = "OK", textoCancelar = "Cancelar" }) {
+    return new Promise((resolve) => {
+      const overlay = document.getElementById("modalOverlay");
+      const msgEl = document.getElementById("modalMensagem");
+      const inputEl = document.getElementById("modalInput");
+      const btnConfirmar = document.getElementById("modalConfirmar");
+      const btnCancelar = document.getElementById("modalCancelar");
+
+      msgEl.textContent = mensagem;
+      inputEl.style.display = comInput ? "block" : "none";
+      inputEl.value = valorInicial;
+      btnCancelar.style.display = comCancelar ? "inline-block" : "none";
+      btnConfirmar.textContent = textoConfirmar;
+      btnCancelar.textContent = textoCancelar;
+
+      overlay.classList.add("aberto");
+      if (comInput) setTimeout(() => inputEl.focus(), 50);
+
+      function fechar() {
+        overlay.classList.remove("aberto");
+        btnConfirmar.onclick = null;
+        btnCancelar.onclick = null;
+      }
+
+      btnConfirmar.onclick = () => {
+        const valor = comInput ? inputEl.value : true;
+        fechar();
+        resolve(valor);
+      };
+      btnCancelar.onclick = () => {
+        fechar();
+        resolve(comInput ? null : false);
+      };
+    });
+  }
+
+  async function modalAlerta(mensagem) {
+    await abrirModal({ mensagem, comCancelar: false, textoConfirmar: "OK" });
+  }
+  async function modalConfirmar(mensagem) {
+    return await abrirModal({ mensagem, comCancelar: true, textoConfirmar: "Sim", textoCancelar: "Cancelar" });
+  }
+  async function modalPrompt(mensagem, valorInicial = "") {
+    return await abrirModal({ mensagem, comInput: true, valorInicial, comCancelar: true, textoConfirmar: "OK", textoCancelar: "Cancelar" });
+  }
+
+  // A senha não fica em texto puro no código — guardamos só o hash SHA-256 dela.
+  // Aviso importante: isso NÃO é segurança real, porque tudo roda no navegador do
+  // usuário. Alguém disposto a tentar senhas offline contra esse hash ainda pode
+  // descobrir a senha original. Pra proteção de verdade, seria preciso um servidor
+  // validando o login (fora do que dá pra fazer só com HTML/JS no cliente).
+  const ADMIN_PASSWORD_HASH = "31756be9e088f88f6be86a9dd50590b6b0fddd357a7ba8d18f673adc340b7314";
+  const ADMIN_SESSION_KEY = "biblioteca-sessao-bibliotecaria";
+  // Se já tinha feito login antes neste navegador, continua logada mesmo
+  // depois de atualizar a página — sem precisar digitar a senha de novo.
+  let isAdminLoggedIn = (localStorage.getItem(ADMIN_SESSION_KEY) === "true");
+
+  async function hashText(text) {
+    const data = new TextEncoder().encode(text);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    return Array.from(new Uint8Array(hashBuffer))
+      .map(b => b.toString(16).padStart(2, "0"))
+      .join("");
+  }
+
+  // Credenciais do EmailJS (usadas no formulário de contato)
+  const EMAILJS_PUBLIC_KEY = "_9nbVoub4jzy9q5Vn";
+  const EMAILJS_SERVICE_ID = "service_nq1njcg";
+  const EMAILJS_TEMPLATE_ID = "template_nn3n09j";
+  emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+
+  // Lista fixa de gêneros disponíveis para os livros
+  const GENEROS = ["Ficção", "Aventura", "Fantasia", "Romance", "Terror e Suspense", "Infantil", "Biografia", "Didático", "Poesia", "Quadrinhos", "Mangás", "Outro"];
+
+  // ---- Persistência (JSONBin.io - banco de dados na internet) ----
+  // Guardamos tudo (livros + emails das bibliotecárias) num único "bin",
+  // então funciona de qualquer navegador ou computador, desde que o site
+  // esteja hospedado com endereço https:// (não abrindo o arquivo direto).
+  const JSONBIN_BIN_ID = "6a7d21d7f5f4af5e290ed271";
+  const JSONBIN_MASTER_KEY = "$2a$10$31/POkHbZwICjUCaKtK4hOgEdLQX4K0WlN1ucKJW0dyhObnaBRWFe";
+  const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+
+  const DEFAULT_LIBRARY_EMAILS = [
+    { name: "Luciara Perereia", email: "luciara.perereia@educacao.mg.gov.br" },
+    { name: "Regiane Borges", email: "regiane.borges@educacao.mg.gov.br" },
+    { name: "Terceira Bibliotecária", email: "terceiro.email@educacao.mg.gov.br" }
+  ];
+
+  let books = [];
+  let libraryEmails = DEFAULT_LIBRARY_EMAILS.slice();
+  let bookLimit = 1;
+
+  async function loadData() {
+    try {
+      const response = await fetch(`${JSONBIN_URL}/latest`, {
+        headers: { "X-Master-Key": JSONBIN_MASTER_KEY }
+      });
+      if (!response.ok) throw new Error(`Erro HTTP ${response.status}`);
+      const data = await response.json();
+      books = (data.record && Array.isArray(data.record.books)) ? data.record.books : [];
+      libraryEmails = (data.record && Array.isArray(data.record.libraryEmails) && data.record.libraryEmails.length)
+        ? data.record.libraryEmails
+        : DEFAULT_LIBRARY_EMAILS.slice();
+      bookLimit = (data.record && typeof data.record.bookLimit === "number" && data.record.bookLimit >= 1)
+        ? data.record.bookLimit
+        : 1;
+    } catch (err) {
+      console.error("Erro ao carregar dados do JSONBin:", err);
+      books = [];
+      libraryEmails = DEFAULT_LIBRARY_EMAILS.slice();
+      document.getElementById("loadingMsg").textContent =
+        "Não foi possível carregar os dados salvos. Verifique sua conexão com a internet.";
+      document.getElementById("loadingMsg").style.color = "#ffb3b3";
+      renderAll();
+      return;
+    }
+    document.getElementById("loadingMsg").style.display = "none";
+    renderAll();
+  }
+
+  async function saveData() {
+    try {
+      const response = await fetch(JSONBIN_URL, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Master-Key": JSONBIN_MASTER_KEY
+        },
+        body: JSON.stringify({ books, libraryEmails, bookLimit })
+      });
+      if (!response.ok) throw new Error(`Erro HTTP ${response.status}`);
+    } catch (err) {
+      console.error("Erro ao salvar dados no JSONBin:", err);
+      await modalAlerta("Não foi possível salvar os dados agora. Verifique sua conexão com a internet e tente novamente.");
+    }
+  }
+
+  function renderAll() {
+    popularSelectsDeGenero();
+    renderLists();
+    renderLibraryEmailsForm();
+    renderContactRecipients();
+    document.getElementById("bookLimitInput").value = bookLimit;
+
+    // Se já estava logada (sessão salva), mostra o painel e a aba Atrasados
+    // direto, sem pedir senha de novo.
+    if (isAdminLoggedIn) {
+      document.getElementById("abaAtrasadosBtn").style.display = "";
+    }
+  }
+
+  // ---- Abas ----
+  document.getElementById("abaInicioBtn").addEventListener("click", () => trocarAba("abaInicio", "abaInicioBtn"));
+  document.getElementById("abaLendoBtn").addEventListener("click", () => trocarAba("abaLendo", "abaLendoBtn"));
+  document.getElementById("abaAtrasadosBtn").addEventListener("click", () => trocarAba("abaAtrasados", "abaAtrasadosBtn"));
+  document.getElementById("abaContatoBtn").addEventListener("click", () => trocarAba("abaContato", "abaContatoBtn"));
+
+  function trocarAba(idConteudo, idBotao) {
+    document.querySelectorAll(".conteudo-aba").forEach(el => el.classList.remove("ativa"));
+    document.querySelectorAll(".aba-btn").forEach(el => el.classList.remove("ativa"));
+    document.getElementById(idConteudo).classList.add("ativa");
+    document.getElementById(idBotao).classList.add("ativa");
+  }
+
+  function popularSelectsDeGenero() {
+    const newBookGenero = document.getElementById("newBookGenero");
+    const filtroGenero = document.getElementById("filtroGenero");
+
+    newBookGenero.innerHTML = "";
+    GENEROS.forEach(g => {
+      const option = document.createElement("option");
+      option.value = g;
+      option.textContent = g;
+      newBookGenero.appendChild(option);
+    });
+
+    filtroGenero.innerHTML = "";
+    const optTodos = document.createElement("option");
+    optTodos.value = "Todos";
+    optTodos.textContent = "Todos os gêneros";
+    filtroGenero.appendChild(optTodos);
+    GENEROS.forEach(g => {
+      const option = document.createElement("option");
+      option.value = g;
+      option.textContent = g;
+      filtroGenero.appendChild(option);
+    });
+  }
+
+  function formatarData(iso) {
+    if (!iso) return "sem data definida";
+    const [ano, mes, dia] = iso.split("-");
+    return `${dia}/${mes}/${ano}`;
+  }
+
+  function diasDeAtraso(iso) {
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+    const entrega = new Date(iso + "T00:00:00");
+    const diffMs = hoje - entrega;
+    return Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  }
+
+  function renderLists() {
+    popularFiltroAutor();
+    renderDisponiveis();
+    renderEmprestados();
+    renderAtrasados();
+    renderEstatisticas();
+  }
+
+  function popularFiltroAutor() {
+    const filtroAutor = document.getElementById("filtroAutor");
+    const valorAtual = filtroAutor.value || "Todos";
+
+    // Lista de autores distintos entre os livros disponíveis, ignorando vazios
+    const autoresDisponiveis = [...new Set(
+      books.filter(b => b.status === "available" && b.autor && b.autor.trim())
+        .map(b => b.autor.trim())
+    )].sort((a, b) => a.localeCompare(b, "pt-BR"));
+
+    filtroAutor.innerHTML = "";
+    const optTodos = document.createElement("option");
+    optTodos.value = "Todos";
+    optTodos.textContent = "Todos os autores";
+    filtroAutor.appendChild(optTodos);
+    autoresDisponiveis.forEach(autor => {
+      const option = document.createElement("option");
+      option.value = autor;
+      option.textContent = autor;
+      filtroAutor.appendChild(option);
+    });
+
+    // Mantém a seleção anterior se ela ainda existir na lista
+    if ([...filtroAutor.options].some(o => o.value === valorAtual)) {
+      filtroAutor.value = valorAtual;
+    }
+  }
+
+  function renderEstatisticas() {
+    const container = document.getElementById("estatisticasContainer");
+    if (!container) return;
+
+    const total = books.length;
+    const disponiveis = books.filter(b => b.status === "available").length;
+    const emprestados = books.filter(b => b.status === "reading").length;
+    const atrasados = books.filter(b => b.status === "reading" && b.dataEntrega && diasDeAtraso(b.dataEntrega) > 0).length;
+    const totalNaFila = books.reduce((soma, b) => soma + ((b.fila || []).length), 0);
+
+    // Gênero mais popular (mais livros cadastrados naquele gênero)
+    const contagemGeneros = {};
+    books.forEach(b => {
+      const g = b.genero || "Outro";
+      contagemGeneros[g] = (contagemGeneros[g] || 0) + 1;
+    });
+    let generoTopo = "—";
+    let maiorContagem = 0;
+    for (const g in contagemGeneros) {
+      if (contagemGeneros[g] > maiorContagem) {
+        maiorContagem = contagemGeneros[g];
+        generoTopo = g;
+      }
+    }
+
+    container.innerHTML = "";
+    const grid = document.createElement("div");
+    grid.className = "estatisticas-grid";
+
+    const cards = [
+      { numero: total, rotulo: "Livros no total" },
+      { numero: disponiveis, rotulo: "Disponíveis" },
+      { numero: emprestados, rotulo: "Emprestados" },
+      { numero: atrasados, rotulo: "Atrasados" },
+      { numero: totalNaFila, rotulo: "Pessoas na fila de espera" },
+      { numero: generoTopo, rotulo: "Gênero mais comum" }
+    ];
+
+    cards.forEach(c => {
+      const card = document.createElement("div");
+      card.className = "card-estatistica";
+      const numero = document.createElement("span");
+      numero.className = "numero";
+      numero.textContent = c.numero;
+      const rotulo = document.createElement("span");
+      rotulo.className = "rotulo";
+      rotulo.textContent = c.rotulo;
+      card.appendChild(numero);
+      card.appendChild(rotulo);
+      grid.appendChild(card);
+    });
+
+    container.appendChild(grid);
+  }
+
+  function renderDisponiveis() {
+    const container = document.getElementById("availableBooksContainer");
+    const filtro = document.getElementById("filtroGenero").value || "Todos";
+    const filtroAutorValor = document.getElementById("filtroAutor").value || "Todos";
+    const busca = document.getElementById("buscaTitulo").value.trim().toLowerCase();
+    container.innerHTML = "";
+
+    const disponiveis = books.filter(b =>
+      b.status === "available" &&
+      (filtro === "Todos" || b.genero === filtro) &&
+      (filtroAutorValor === "Todos" || (b.autor && b.autor.trim() === filtroAutorValor)) &&
+      (busca === "" || b.title.toLowerCase().includes(busca) || (b.autor && b.autor.toLowerCase().includes(busca)))
+    );
+
+    if (disponiveis.length === 0) {
+      container.innerHTML = '<p class="vazio">Nenhum livro disponível nesse filtro/busca no momento.</p>';
+      return;
+    }
+
+    const generosPresentes = GENEROS.filter(g => disponiveis.some(b => b.genero === g));
+    // Livros sem gênero definido (dados antigos) caem em "Outro"
+    const semGenero = disponiveis.filter(b => !GENEROS.includes(b.genero));
+
+    generosPresentes.forEach(genero => {
+      const titulo = document.createElement("h3");
+      titulo.className = "genero-titulo";
+      titulo.textContent = genero;
+      container.appendChild(titulo);
+
+      const ul = document.createElement("ul");
+      disponiveis.filter(b => b.genero === genero).forEach(book => ul.appendChild(criarItemDisponivel(book)));
+      container.appendChild(ul);
+    });
+
+    if (semGenero.length > 0) {
+      const titulo = document.createElement("h3");
+      titulo.className = "genero-titulo";
+      titulo.textContent = "Outro";
+      container.appendChild(titulo);
+      const ul = document.createElement("ul");
+      semGenero.forEach(book => ul.appendChild(criarItemDisponivel(book)));
+      container.appendChild(ul);
+    }
+  }
+
+  function criarItemDisponivel(book) {
+    const li = document.createElement("li");
+    li.className = "item-disponivel";
+
+    const linhaPrincipal = document.createElement("div");
+    linhaPrincipal.className = "linha-principal";
+
+    const infoTitulo = document.createElement("span");
+    const tituloTexto = document.createElement("span");
+    tituloTexto.textContent = book.title;
+    infoTitulo.appendChild(tituloTexto);
+    if (book.autor && book.autor.trim()) {
+      const autorTexto = document.createElement("span");
+      autorTexto.style.display = "block";
+      autorTexto.style.fontSize = "0.78rem";
+      autorTexto.style.color = "#5c7ca3";
+      autorTexto.textContent = book.autor.trim();
+      infoTitulo.appendChild(autorTexto);
+    }
+    linhaPrincipal.appendChild(infoTitulo);
+
+    const acoes = document.createElement("div");
+    acoes.className = "acoes";
+
+    const agendarBtn = document.createElement("button");
+    agendarBtn.className = "btn-confirmar";
+    agendarBtn.textContent = "Agendar";
+    acoes.appendChild(agendarBtn);
+
+    if (isAdminLoggedIn) {
+      const editBtn = document.createElement("button");
+      editBtn.className = "btn-secundario";
+      editBtn.textContent = "Editar";
+      editBtn.onclick = () => editarLivro(book.id);
+
+      const delBtn = document.createElement("button");
+      delBtn.className = "btn-perigo";
+      delBtn.textContent = "Remover";
+      delBtn.onclick = () => removerLivro(book.id);
+
+      acoes.appendChild(editBtn);
+      acoes.appendChild(delBtn);
+    }
+    linhaPrincipal.appendChild(acoes);
+    li.appendChild(linhaPrincipal);
+
+    // Campinho que aparece dentro do próprio item ao clicar em "Agendar"
+    const formInline = document.createElement("div");
+    formInline.className = "agendar-inline";
+
+    const nomeInput = document.createElement("input");
+    nomeInput.type = "text";
+    nomeInput.placeholder = "Seu nome";
+
+    const confirmarBtn = document.createElement("button");
+    confirmarBtn.className = "btn-confirmar";
+    confirmarBtn.textContent = "Confirmar";
+
+    const cancelarBtn = document.createElement("button");
+    cancelarBtn.className = "btn-secundario";
+    cancelarBtn.textContent = "Cancelar";
+
+    const erroSpan = document.createElement("span");
+    erroSpan.className = "erro-inline";
+
+    formInline.appendChild(nomeInput);
+    formInline.appendChild(confirmarBtn);
+    formInline.appendChild(cancelarBtn);
+    formInline.appendChild(erroSpan);
+    li.appendChild(formInline);
+
+    agendarBtn.onclick = () => {
+      formInline.classList.toggle("aberto");
+      if (formInline.classList.contains("aberto")) nomeInput.focus();
+    };
+
+    cancelarBtn.onclick = () => {
+      formInline.classList.remove("aberto");
+      nomeInput.value = "";
+      erroSpan.classList.remove("visivel");
+    };
+
+    confirmarBtn.onclick = () => agendarLivro(book.id, nomeInput.value, erroSpan);
+    nomeInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        agendarLivro(book.id, nomeInput.value, erroSpan);
+      }
+    });
+
+    return li;
+  }
+
+  async function agendarLivro(id, nomeDigitado, erroSpan) {
+    const book = books.find(b => b.id === id);
+    if (!book) return;
+
+    if (!nomeDigitado || !nomeDigitado.trim()) {
+      if (erroSpan) {
+        erroSpan.textContent = "Digite seu nome para agendar.";
+        erroSpan.classList.add("visivel");
+      }
+      return;
+    }
+    const nome = nomeDigitado.trim();
+
+    const emprestadosComEssePleitor = books.filter(
+      b => b.status === "reading" && b.reader && b.reader.trim().toLowerCase() === nome.toLowerCase()
+    ).length;
+
+    if (emprestadosComEssePleitor >= bookLimit) {
+      const msg = bookLimit === 1
+        ? `${nome} já está com um livro emprestado. Devolva o livro atual antes de agendar outro.`
+        : `${nome} já atingiu o limite de ${bookLimit} livros emprestados ao mesmo tempo.`;
+      if (erroSpan) {
+        erroSpan.textContent = msg;
+        erroSpan.classList.add("visivel");
+      }
+      return;
+    }
+
+    if (erroSpan) erroSpan.classList.remove("visivel");
+
+    book.status = "reading";
+    book.reader = nome;
+    const sugestao = new Date();
+    sugestao.setDate(sugestao.getDate() + 14);
+    book.dataEntrega = sugestao.toISOString().split("T")[0];
+
+    await saveData();
+    renderLists();
+    await modalAlerta(`Livro "${book.title}" agendado para ${nome} com sucesso. Devolução prevista: ${formatarData(book.dataEntrega)}.`);
+  }
+
+  function renderEmprestados() {
+    const readingList = document.getElementById("readingBooksList");
+    readingList.innerHTML = "";
+    const lendo = books.filter(b => b.status === "reading");
+
+    if (lendo.length === 0) {
+      readingList.innerHTML = '<li class="vazio">Nenhum livro emprestado no momento.</li>';
+      return;
+    }
+
+    lendo.forEach(book => {
+      const fila = book.fila || [];
+      const li = document.createElement("li");
+      li.className = "item-disponivel";
+
+      const linhaPrincipal = document.createElement("div");
+      linhaPrincipal.className = "linha-principal";
+
+      const span = document.createElement("span");
+      const autorTexto = book.autor && book.autor.trim() ? ` (${book.autor.trim()})` : "";
+      span.textContent = `${book.title}${autorTexto} — Com: ${book.reader} — Devolução: ${formatarData(book.dataEntrega)}`;
+      linhaPrincipal.appendChild(span);
+
+      const acoes = document.createElement("div");
+      acoes.className = "acoes";
+
+      if (fila.length > 0) {
+        const badgeFila = document.createElement("span");
+        badgeFila.className = "badge";
+        badgeFila.textContent = `${fila.length} na fila`;
+        acoes.appendChild(badgeFila);
+      }
+
+      const filaBtn = document.createElement("button");
+      filaBtn.className = "btn-secundario";
+      filaBtn.textContent = "Entrar na fila";
+      acoes.appendChild(filaBtn);
+
+      if (isAdminLoggedIn) {
+        const dateInput = document.createElement("input");
+        dateInput.type = "date";
+        dateInput.value = book.dataEntrega || "";
+
+        const saveDateBtn = document.createElement("button");
+        saveDateBtn.className = "btn-secundario";
+        saveDateBtn.textContent = "Salvar data";
+        saveDateBtn.onclick = () => salvarDataEntrega(book.id, dateInput.value);
+
+        acoes.appendChild(dateInput);
+        acoes.appendChild(saveDateBtn);
+
+        const concluirBtn = document.createElement("button");
+        concluirBtn.className = "btn-confirmar";
+        concluirBtn.textContent = "Registrar Devolução";
+        concluirBtn.onclick = () => concluirLeitura(book.id);
+        acoes.appendChild(concluirBtn);
+      }
+
+      linhaPrincipal.appendChild(acoes);
+      li.appendChild(linhaPrincipal);
+
+      // Formulário inline pra entrar na fila de espera
+      const formFila = document.createElement("div");
+      formFila.className = "agendar-inline";
+
+      const nomeInput = document.createElement("input");
+      nomeInput.type = "text";
+      nomeInput.placeholder = "Seu nome";
+
+      const emailInput = document.createElement("input");
+      emailInput.type = "email";
+      emailInput.placeholder = "Seu email (pra avisar quando o livro voltar)";
+
+      const confirmarFilaBtn = document.createElement("button");
+      confirmarFilaBtn.className = "btn-confirmar";
+      confirmarFilaBtn.textContent = "Confirmar";
+
+      const cancelarFilaBtn = document.createElement("button");
+      cancelarFilaBtn.className = "btn-secundario";
+      cancelarFilaBtn.textContent = "Cancelar";
+
+      const erroFilaSpan = document.createElement("span");
+      erroFilaSpan.className = "erro-inline";
+
+      formFila.appendChild(nomeInput);
+      formFila.appendChild(emailInput);
+      formFila.appendChild(confirmarFilaBtn);
+      formFila.appendChild(cancelarFilaBtn);
+      formFila.appendChild(erroFilaSpan);
+      li.appendChild(formFila);
+
+      filaBtn.onclick = () => {
+        formFila.classList.toggle("aberto");
+        if (formFila.classList.contains("aberto")) nomeInput.focus();
+      };
+      cancelarFilaBtn.onclick = () => {
+        formFila.classList.remove("aberto");
+        nomeInput.value = "";
+        emailInput.value = "";
+        erroFilaSpan.classList.remove("visivel");
+      };
+      confirmarFilaBtn.onclick = () => entrarNaFila(book.id, nomeInput.value, emailInput.value, erroFilaSpan);
+
+      readingList.appendChild(li);
+    });
+  }
+
+  async function entrarNaFila(id, nomeDigitado, emailDigitado, erroSpan) {
+    const book = books.find(b => b.id === id);
+    if (!book) return;
+
+    const nome = (nomeDigitado || "").trim();
+    const email = (emailDigitado || "").trim();
+    if (!nome || !email) {
+      if (erroSpan) {
+        erroSpan.textContent = "Preencha seu nome e email pra entrar na fila.";
+        erroSpan.classList.add("visivel");
+      }
+      return;
+    }
+    if (erroSpan) erroSpan.classList.remove("visivel");
+
+    if (!book.fila) book.fila = [];
+    book.fila.push({ name: nome, email: email });
+    await saveData();
+    renderLists();
+    await modalAlerta(`Pronto! Você está na fila de espera de "${book.title}". Avisamos por email assim que ele voltar.`);
+  }
+
+
+  function renderAtrasados() {
+    const lateList = document.getElementById("lateBooksList");
+    lateList.innerHTML = "";
+    const atrasados = books.filter(b => b.status === "reading" && b.dataEntrega && diasDeAtraso(b.dataEntrega) > 0);
+
+    if (atrasados.length === 0) {
+      lateList.innerHTML = '<li class="vazio">Nenhuma devolução atrasada no momento.</li>';
+      return;
+    }
+
+    atrasados.forEach(book => {
+      const dias = diasDeAtraso(book.dataEntrega);
+      const li = document.createElement("li");
+      li.className = "atrasado";
+      const span = document.createElement("span");
+      const autorTexto = book.autor && book.autor.trim() ? ` (${book.autor.trim()})` : "";
+      span.textContent = `${book.title}${autorTexto} — Com: ${book.reader} — Devolução prevista: ${formatarData(book.dataEntrega)}`;
+      const badge = document.createElement("span");
+      badge.className = "badge badge-atraso";
+      badge.textContent = `${dias} dia${dias > 1 ? "s" : ""} de atraso`;
+      li.appendChild(span);
+      li.appendChild(badge);
+      lateList.appendChild(li);
+    });
+  }
+
+  function renderLibraryEmailsForm() {
+    const container = document.getElementById("libraryEmailsForm");
+    container.innerHTML = "";
+    libraryEmails.forEach((entry, idx) => {
+      const linha = document.createElement("div");
+      linha.className = "linha-email";
+
+      const nomeInput = document.createElement("input");
+      nomeInput.type = "text";
+      nomeInput.placeholder = "Nome";
+      nomeInput.value = entry.name || "";
+      nomeInput.dataset.idx = idx;
+      nomeInput.dataset.campo = "name";
+
+      const emailInput = document.createElement("input");
+      emailInput.type = "email";
+      emailInput.placeholder = "email@escola.gov.br";
+      emailInput.value = entry.email || "";
+      emailInput.dataset.idx = idx;
+      emailInput.dataset.campo = "email";
+
+      linha.appendChild(nomeInput);
+      linha.appendChild(emailInput);
+      container.appendChild(linha);
+    });
+  }
+
+  function renderContactRecipients() {
+    const select = document.getElementById("contactRecipient");
+    select.innerHTML = "";
+
+    const optAll = document.createElement("option");
+    optAll.value = "all";
+    optAll.textContent = "Todas as bibliotecárias";
+    select.appendChild(optAll);
+
+    libraryEmails.forEach((entry, idx) => {
+      const option = document.createElement("option");
+      option.value = idx;
+      option.textContent = entry.name || entry.email;
+      select.appendChild(option);
+    });
+  }
+
+  async function editarLivro(id) {
+    const book = books.find(b => b.id === id);
+    if (!book) return;
+
+    const novoTitulo = await modalPrompt("Novo título do livro:", book.title);
+    if (novoTitulo === null) return; // cancelou a edição
+    const tituloFinal = novoTitulo.trim() ? novoTitulo.trim() : book.title;
+
+    const novoAutor = await modalPrompt("Autor do livro (deixe em branco se não souber):", book.autor || "");
+    const autorFinal = novoAutor === null ? (book.autor || "") : novoAutor.trim();
+
+    const listaGeneros = GENEROS.join(", ");
+    const novoGenero = await modalPrompt(`Novo gênero do livro. Escolha um destes:\n${listaGeneros}`, book.genero || "Outro");
+
+    let generoFinal = book.genero || "Outro";
+    if (novoGenero && novoGenero.trim()) {
+      const generoDigitado = novoGenero.trim();
+      const encontrado = GENEROS.find(g => g.toLowerCase() === generoDigitado.toLowerCase());
+      if (encontrado) {
+        generoFinal = encontrado;
+      } else {
+        await modalAlerta(`Gênero "${generoDigitado}" não está na lista. O gênero foi mantido como "${generoFinal}".`);
+      }
+    }
+
+    // Só troca título, autor e gênero — status, leitor e data de devolução continuam como estavam
+    book.title = tituloFinal;
+    book.autor = autorFinal;
+    book.genero = generoFinal;
+    await saveData();
+    renderLists();
+  }
+
+  async function removerLivro(id) {
+    const book = books.find(b => b.id === id);
+    if (!book) return;
+    const confirmou = await modalConfirmar(`Remover "${book.title}" da biblioteca?`);
+    if (confirmou) {
+      books = books.filter(b => b.id !== id);
+      await saveData();
+      renderLists();
+    }
+  }
+
+  async function concluirLeitura(id) {
+    if (!isAdminLoggedIn) { await modalAlerta("Somente a bibliotecária pode registrar devoluções."); return; }
+    const book = books.find(b => b.id === id);
+    if (!book) return;
+    book.status = "available";
+    delete book.reader;
+    delete book.dataEntrega;
+
+    // Se tem gente esperando na fila, avisa o primeiro por email
+    let avisoFila = "";
+    if (book.fila && book.fila.length > 0) {
+      const proximo = book.fila.shift();
+      try {
+        await emailjs.send(
+          EMAILJS_SERVICE_ID,
+          EMAILJS_TEMPLATE_ID,
+          {
+            from_name: "Biblioteca Virtual",
+            from_email: "biblioteca@escola.gov.br",
+            reply_to: "biblioteca@escola.gov.br",
+            message: `Olá, ${proximo.name}! O livro "${book.title}" que você estava esperando já está disponível na Biblioteca Virtual. Corre lá agendar antes que outra pessoa pegue!`,
+            to_email: proximo.email
+          },
+          { publicKey: EMAILJS_PUBLIC_KEY }
+        );
+        avisoFila = ` ${proximo.name} foi avisado(a) por email.`;
+      } catch (err) {
+        console.error("Erro ao avisar a fila de espera:", err);
+        avisoFila = ` Não foi possível avisar ${proximo.name} por email agora — avise manualmente se puder.`;
+      }
+    }
+
+    await saveData();
+    renderLists();
+    if (avisoFila) await modalAlerta(`Devolução registrada.${avisoFila}`);
+  }
+
+
+  async function salvarDataEntrega(id, novaData) {
+    if (!isAdminLoggedIn) { await modalAlerta("Somente a bibliotecária pode alterar a data de entrega."); return; }
+    const book = books.find(b => b.id === id);
+    if (!book) return;
+    if (!novaData) { await modalAlerta("Escolha uma data válida."); return; }
+    book.dataEntrega = novaData;
+    await saveData();
+    renderLists();
+  }
+
+  // Ícone escondido que abre a área da bibliotecária
+  document.getElementById("trigger").addEventListener("click", () => {
+    if (isAdminLoggedIn) {
+      const painel = document.getElementById("painelAdmin");
+      painel.style.display = painel.style.display === "block" ? "none" : "block";
+    } else {
+      const login = document.getElementById("loginPanel");
+      login.style.display = login.style.display === "block" ? "none" : "block";
+    }
+  });
+
+  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const inputPassword = document.getElementById("adminPassword").value;
+    const feedback = document.getElementById("loginFeedback");
+    const inputHash = await hashText(inputPassword);
+
+    if (inputHash === ADMIN_PASSWORD_HASH) {
+      isAdminLoggedIn = true;
+      localStorage.setItem(ADMIN_SESSION_KEY, "true");
+      document.getElementById("painelAdmin").style.display = "block";
+      document.getElementById("loginPanel").style.display = "none";
+      document.getElementById("abaAtrasadosBtn").style.display = "";
+      feedback.textContent = "";
+      renderLists();
+    } else {
+      feedback.textContent = "Senha incorreta. Tente novamente.";
+    }
+  });
+
+  document.getElementById("addBookForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!isAdminLoggedIn) { await modalAlerta("Somente a bibliotecária pode adicionar livros."); return; }
+    const newTitle = document.getElementById("newBookTitle").value.trim();
+    const newAutor = document.getElementById("newBookAutor").value.trim();
+    const newGenero = document.getElementById("newBookGenero").value;
+    if (newTitle) {
+      const newId = books.length ? Math.max(...books.map(b => b.id)) + 1 : 1;
+      books.push({ id: newId, title: newTitle, autor: newAutor, genero: newGenero, status: "available" });
+      await saveData();
+      await modalAlerta(`Livro "${newTitle}" adicionado com sucesso.`);
+      renderLists();
+      e.target.reset();
+    }
+  });
+
+  document.getElementById("saveEmailsBtn").addEventListener("click", async () => {
+    if (!isAdminLoggedIn) { await modalAlerta("Somente a bibliotecária pode editar os emails."); return; }
+    const inputs = document.querySelectorAll("#libraryEmailsForm input");
+    const novaLista = libraryEmails.map(e => ({ ...e }));
+    inputs.forEach(input => {
+      const idx = parseInt(input.dataset.idx);
+      const campo = input.dataset.campo;
+      novaLista[idx][campo] = input.value.trim();
+    });
+    libraryEmails = novaLista;
+    await saveData();
+    renderContactRecipients();
+    const feedback = document.getElementById("emailsFeedback");
+    feedback.style.color = "#1b5e20";
+    feedback.textContent = "Emails atualizados com sucesso.";
+  });
+
+  document.getElementById("saveLimitBtn").addEventListener("click", async () => {
+    if (!isAdminLoggedIn) { await modalAlerta("Somente a bibliotecária pode editar o limite."); return; }
+    const novoLimite = parseInt(document.getElementById("bookLimitInput").value);
+    const feedback = document.getElementById("limitFeedback");
+    if (!novoLimite || novoLimite < 1) {
+      feedback.style.color = "#b71c1c";
+      feedback.textContent = "Informe um número válido (mínimo 1).";
+      return;
+    }
+    bookLimit = novoLimite;
+    await saveData();
+    feedback.style.color = "#1b5e20";
+    feedback.textContent = `Limite atualizado para ${bookLimit} livro(s) por leitor.`;
+  });
+
+  document.getElementById("backupBtn").addEventListener("click", async () => {
+    if (!isAdminLoggedIn) { await modalAlerta("Somente a bibliotecária pode baixar o backup."); return; }
+
+    const dadosBackup = {
+      geradoEm: new Date().toISOString(),
+      books: books,
+      libraryEmails: libraryEmails,
+      bookLimit: bookLimit
+    };
+
+    const conteudo = JSON.stringify(dadosBackup, null, 2);
+    const blob = new Blob([conteudo], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const dataFormatada = new Date().toISOString().split("T")[0];
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `backup-biblioteca-${dataFormatada}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById("logoutBtn").addEventListener("click", async () => {
+    const confirmouSaida = await modalConfirmar("Sair da conta da bibliotecária neste navegador?");
+    if (!confirmouSaida) return;
+    isAdminLoggedIn = false;
+    localStorage.removeItem(ADMIN_SESSION_KEY);
+    document.getElementById("painelAdmin").style.display = "none";
+    document.getElementById("abaAtrasadosBtn").style.display = "none";
+    // Se estava na aba Atrasados, volta pra Início
+    trocarAba("abaInicio", "abaInicioBtn");
+    renderLists();
+  });
+
+  document.getElementById("filtroGenero").addEventListener("change", renderDisponiveis);
+  document.getElementById("buscaTitulo").addEventListener("input", renderDisponiveis);
+  document.getElementById("filtroAutor").addEventListener("change", renderDisponiveis);
+
+  // Contato: envio via EmailJS, com escolha da bibliotecária destinatária
+  document.getElementById("contactForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = document.getElementById("contactName").value.trim();
+    const email = document.getElementById("contactEmail").value.trim();
+    const message = document.getElementById("contactMessage").value.trim();
+    const recipientValue = document.getElementById("contactRecipient").value;
+    const feedback = document.getElementById("contactFeedback");
+    const submitBtn = document.getElementById("contactSubmitBtn");
+
+    if (!(name && email && message)) {
+      feedback.style.color = "#b71c1c";
+      feedback.textContent = "Por favor, preencha todos os campos.";
+      return;
+    }
+
+    let toEmail;
+    if (recipientValue === "all") {
+      toEmail = libraryEmails.map(e => e.email).join(", ");
+    } else {
+      const entry = libraryEmails[parseInt(recipientValue)];
+      toEmail = entry ? entry.email : libraryEmails.map(e => e.email).join(", ");
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Enviando...";
+    feedback.style.color = "#3a6ea8";
+    feedback.textContent = "Enviando sua mensagem...";
+
+    try {
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          from_name: name,
+          from_email: email,
+          reply_to: email,
+          message: message,
+          to_email: toEmail
+        },
+        { publicKey: EMAILJS_PUBLIC_KEY }
+      );
+      feedback.style.color = "#1b5e20";
+      feedback.textContent = "Mensagem enviada com sucesso! Obrigado por entrar em contato.";
+      e.target.reset();
+      renderContactRecipients();
+    } catch (err) {
+      console.error("Erro ao enviar email:", err);
+      const detalhe = (err && (err.text || err.message)) ? ` (${err.text || err.message})` : "";
+      feedback.style.color = "#b71c1c";
+      feedback.textContent = `Não foi possível enviar a mensagem agora${detalhe}. Tente novamente em instantes.`;
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Enviar Mensagem";
+    }
+  });
+
+  loadData();
+</script>
+</body></html>
